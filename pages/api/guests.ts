@@ -40,14 +40,14 @@ export default async function handler(
       // connect to the database
       let { db } = await connectToDatabase();
       // fetch the posts
-      let posts = await db
+      let guests = await db
           .collection(collectionName)
-          .find({})
-          .sort({ published: -1 })
+          .find()
           .toArray();
-      // return the posts
+      // return the guests
+      console.log(guests);
       return res.json({
-        message: JSON.parse(JSON.stringify(posts)),
+        message: JSON.parse(JSON.stringify(guests)),
         success: true,
       });
     } catch (error) {
