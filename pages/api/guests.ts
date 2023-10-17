@@ -16,27 +16,36 @@ export default async function handler(
   // switch the methods
   switch (req.method) {
     case 'GET': {
-      return getPosts(req, res);
+      return getGuestFormattedByFeature(req, res);
     }
-
     case 'POST': {
-      return addPost(req, res);
+      return addGuest(req, res);
     }
-
     case 'PUT': {
-      return updatePost(req, res);
+      return updateGuest(req, res);
     }
-
     case 'DELETE': {
-      return deletePost(req, res);
+      return deleteGuest(req, res);
     }
   }
 
-  async function getPosts(
+  async function getGuestFormattedByFeature(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ) {
+    if(req.body && req.body.for && req.body.for === "keyvaluepair") {
+      return getGuestsForAutoComplete(req, res);
+    } else {
+      return getGuests(req, res);
+    }
+  }
+
+  async function getGuests(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ){
     try {
+      console.log("getGuests");
       // connect to the database
       let { db } = await connectToDatabase();
       // fetch the posts
@@ -59,7 +68,40 @@ export default async function handler(
     }
   }
 
-  async function addPost(
+  async function getGuestsForAutoComplete(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ){
+    try {
+      console.log("getGuestsForAutoComplete");
+
+      // connect to the database
+      let { db } = await connectToDatabase();
+      // fetch the posts
+      let guests = await db
+          .collection(collectionName)
+          .find()
+          .toArray();
+      const modifiedGuests = guests.map((guest:any) => ({
+        label: `${guest.lastName}, ${guest.firstName}`,
+        value: `${guest.lastName}, ${guest.firstName}`
+      }));
+      // return the guests
+      console.log(modifiedGuests);
+      return res.json({
+        message: JSON.parse(JSON.stringify(modifiedGuests)),
+        success: true,
+      });
+    } catch (error) {
+      // return the error
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
+  }
+
+  async function addGuest(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
@@ -82,7 +124,7 @@ export default async function handler(
     }
   }
 
-  async function updatePost(
+  async function updateGuest(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
@@ -113,7 +155,7 @@ export default async function handler(
     }
   }
 
-  async function deletePost(
+  async function deleteGuest(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
