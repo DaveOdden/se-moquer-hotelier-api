@@ -33,7 +33,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
-    if(req.body && req.body.for && req.body.for === "keyvaluepair") {
+    if(req.query && req.query.for && req.query.for === "keyvaluepair") {
       return getGuestsForAutoComplete(req, res);
     } else {
       return getGuests(req, res);
