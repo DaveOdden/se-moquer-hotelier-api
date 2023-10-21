@@ -12,9 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-
-  console.log(req.method);
-
+  
   // switch the methods
   switch (req.method) {
     case 'GET': {
@@ -28,6 +26,9 @@ export default async function handler(
     }
     case 'DELETE': {
       return deleteGuest(req, res);
+    }
+    case 'OPTIONS': {
+      return res.status(200).send({message: 'ok'});
     }
   }
 
