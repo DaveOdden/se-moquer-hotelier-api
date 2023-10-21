@@ -133,13 +133,17 @@ export default async function handler(
     try {
       // connect to the database
       let { db } = await connectToDatabase();
-console.log(req.body);
+      let id = req.body._id
+      delete req.body._id
+      console.log(req.body);
+      console.log(req.body._id);
+
       // update the published status of the post
       await db.collection(collectionName).updateOne(
         {
-          _id: new ObjectId(req.query.id),
+          _id: new ObjectId(id),
         },
-        { $set: JSON.parse(req.body) }
+        { $set: req.body }
       );
 
       // return a message
