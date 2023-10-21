@@ -134,6 +134,7 @@ export default async function handler(
       let bodyJson = JSON.parse(req.body)
       let id = bodyJson._id
       delete bodyJson._id
+      console.log('TESTING')
       console.log(id);
       console.log(bodyJson);
 
