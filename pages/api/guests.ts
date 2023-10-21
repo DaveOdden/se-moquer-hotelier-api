@@ -131,6 +131,7 @@ export default async function handler(
     try {
       // connect to the database
       let { db } = await connectToDatabase();
+      console.log(req.body);
       let bodyJson = JSON.parse(req.body)
       let id = bodyJson._id
       delete bodyJson._id
