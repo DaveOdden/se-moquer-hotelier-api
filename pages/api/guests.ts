@@ -134,8 +134,9 @@ export default async function handler(
     try {
       // connect to the database
       let { db } = await connectToDatabase();
-      let id = req.body._id
-      delete req.body._id
+      let bodyJson = JSON.parse(req.body)
+      let id = bodyJson._id
+      delete bodyJson._id
       console.log(id);
 
       // update the published status of the post
@@ -143,7 +144,7 @@ export default async function handler(
         {
           _id: new ObjectId(id),
         },
-        { $set: JSON.parse(req.body) }
+        { $set: bodyJson }
       );
 
       // return a message
