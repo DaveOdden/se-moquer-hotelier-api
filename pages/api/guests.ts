@@ -13,6 +13,8 @@ export default async function handler(
   res: NextApiResponse<ResponseData>
 ) {
 
+  console.log(req.method);
+
   // switch the methods
   switch (req.method) {
     case 'GET': {
@@ -165,7 +167,7 @@ console.log(req.body);
 
       // Deleting the post
       await db.collection(collectionName).deleteOne({
-        _id: new ObjectId(req.body.id),
+        _id: new ObjectId(req.query.id),
       });
 
       // returning a message
