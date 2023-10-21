@@ -131,7 +131,7 @@ export default async function handler(
     try {
       // connect to the database
       let { db } = await connectToDatabase();
-
+console.log(req.body);
       // update the published status of the post
       await db.collection(collectionName).updateOne(
         {
