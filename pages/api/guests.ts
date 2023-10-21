@@ -76,8 +76,6 @@ export default async function handler(
     res: NextApiResponse<any>
   ){
     try {
-      console.log("getGuestsForAutoComplete");
-
       // connect to the database
       let { db } = await connectToDatabase();
       // fetch the posts
@@ -90,7 +88,6 @@ export default async function handler(
         value: `${guest.lastName}, ${guest.firstName}`
       }));
       // return the guests
-      console.log(modifiedGuests);
       return res.json({
         message: JSON.parse(JSON.stringify(modifiedGuests)),
         success: true,
@@ -138,11 +135,12 @@ export default async function handler(
       let id = bodyJson._id
       delete bodyJson._id
       console.log(id);
+      console.log(bodyJson);
 
       // update the published status of the post
       await db.collection(collectionName).updateOne(
         {
-          _id: new ObjectId(id),
+          _id: new ObjectId(id)
         },
         { $set: bodyJson }
       );
