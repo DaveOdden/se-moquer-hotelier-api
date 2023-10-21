@@ -165,7 +165,7 @@ console.log(req.body);
 
       // Deleting the post
       await db.collection(collectionName).deleteOne({
-        _id: new ObjectId(req.query.id),
+        _id: new ObjectId(req.body.id),
       });
 
       // returning a message
