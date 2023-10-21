@@ -135,9 +135,9 @@ export default async function handler(
       // update the published status of the post
       await db.collection(collectionName).updateOne(
         {
-          _id: new ObjectId(req.body),
+          _id: new ObjectId(req.query.id),
         },
-        { $set: { published: true } }
+        { $set: req.body }
       );
 
       // return a message
@@ -165,7 +165,7 @@ export default async function handler(
 
       // Deleting the post
       await db.collection(collectionName).deleteOne({
-        _id: new ObjectId(req.body),
+        _id: new ObjectId(req.query.id),
       });
 
       // returning a message
