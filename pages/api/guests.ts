@@ -12,7 +12,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  
+
   // switch the methods
   switch (req.method) {
     case 'GET': {
@@ -144,7 +144,7 @@ export default async function handler(
         {
           _id: new ObjectId(id),
         },
-        { $set: req.body }
+        { $set: JSON.parse(req.body) }
       );
 
       // return a message
