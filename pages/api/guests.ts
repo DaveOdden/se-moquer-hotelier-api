@@ -136,8 +136,7 @@ export default async function handler(
       let { db } = await connectToDatabase();
       let id = req.body._id
       delete req.body._id
-      console.log(req.body);
-      console.log(req.body._id);
+      console.log(id);
 
       // update the published status of the post
       await db.collection(collectionName).updateOne(
