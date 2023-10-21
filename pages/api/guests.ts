@@ -139,7 +139,7 @@ console.log(req.body);
         {
           _id: new ObjectId(req.query.id),
         },
-        { $set: req.body }
+        { $set: JSON.parse(req.body) }
       );
 
       // return a message
