@@ -131,11 +131,7 @@ export default async function handler(
     try {
       // connect to the database
       let { db } = await connectToDatabase();
-      console.log(req.body);
       let bodyJson = JSON.parse(req.body)
-      console.log('TESTING')
-      console.log(req.query.id);
-      console.log(bodyJson);
 
       // update the published status of the post
       await db.collection(collectionName).updateOne(
