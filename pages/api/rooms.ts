@@ -31,6 +31,7 @@ export default async function handler(
       let rooms = await db
           .collection(collectionName)
           .find()
+          .sort({_id:1})
           .toArray();
       return res.json({
         message: JSON.parse(JSON.stringify(rooms)),
