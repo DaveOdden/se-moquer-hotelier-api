@@ -32,8 +32,17 @@ export default async function handler(
           .collection(collectionName)
           .find()
           .toArray();
+
+      let arrayOfRoomsBooked: Array<any> = [];
+      rooms.forEach((record: any) => {
+        if(record.room._id) {
+          arrayOfRoomsBooked.push(record.room._id)
+        }
+      });
+
       return res.json({
         message: JSON.parse(JSON.stringify(rooms)),
+        arrayOfRoomsBooked: arrayOfRoomsBooked,
         success: true,
       });
     } catch (error) {
