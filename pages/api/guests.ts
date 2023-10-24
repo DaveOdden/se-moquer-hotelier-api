@@ -90,7 +90,7 @@ export default async function handler(
       // return the guests
       return res.json({
         guests: guests,
-        message: JSON.parse(JSON.stringify(modifiedGuests)),
+        keyvalpair: JSON.parse(JSON.stringify(modifiedGuests)),
         success: true,
       });
     } catch (error) {
