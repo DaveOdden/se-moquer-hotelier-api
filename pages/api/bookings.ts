@@ -33,6 +33,7 @@ export default async function handler(
           .find()
           .toArray();
 
+
       let arrayOfRoomsBooked: Array<any> = [];
       rooms.forEach((record: any) => {
         if(record.room._id) {

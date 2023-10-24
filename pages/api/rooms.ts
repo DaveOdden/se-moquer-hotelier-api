@@ -15,10 +15,21 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET': {
-      return getRooms(req, res);
+      return getRoomsFormattedByFeature(req, res);
     }
     case 'OPTIONS': {
       return res.status(200).send({message: 'ok'});
+    }
+  }
+
+  async function getRoomsFormattedByFeature(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ) {
+    if(req.query && req.query.for && req.query.for === "keyvaluepair") {
+      return getRoomsForAutoComplete(req, res);
+    } else {
+      return getRooms(req, res);
     }
   }
 
@@ -35,6 +46,35 @@ export default async function handler(
           .toArray();
       return res.json({
         message: JSON.parse(JSON.stringify(rooms)),
+        success: true,
+      });
+    } catch (error) {
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
+  }
+
+  async function getRoomsForAutoComplete(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ){
+    try {
+      // connect to the database
+      let { db } = await connectToDatabase();
+      // fetch the posts
+      let rooms = await db
+          .collection(collectionName)
+          .find()
+          .toArray();
+      const modifiedRooms = rooms.map((room:any) => ({
+        label: room.roomNum,
+        value: `${room.roomNum}${room.status.occupied ? ' (occupied)' : ''}`
+      }));
+      // return the guests
+      return res.json({
+        message: JSON.parse(JSON.stringify(modifiedRooms)),
         success: true,
       });
     } catch (error) {
