@@ -67,6 +67,7 @@ export default async function handler(
       let rooms = await db
           .collection(collectionName)
           .find()
+          .sort({_id:1})
           .toArray();
       const modifiedRooms = rooms.map((room:any) => ({
         label: room.roomNum,
