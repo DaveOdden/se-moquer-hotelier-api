@@ -74,7 +74,8 @@ export default async function handler(
       }));
       // return the guests
       return res.json({
-        message: JSON.parse(JSON.stringify(modifiedRooms)),
+        data: rooms,
+        keyvalpair: JSON.parse(JSON.stringify(modifiedRooms)),
         success: true,
       });
     } catch (error) {
