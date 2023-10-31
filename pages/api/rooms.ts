@@ -61,19 +61,18 @@ export default async function handler(
     res: NextApiResponse<any>
   ){
     try {
-      // connect to the database
       let { db } = await connectToDatabase();
-      // fetch the posts
       let rooms = await db
           .collection(collectionName)
           .find()
           .sort({_id:1})
           .toArray();
+          
       const modifiedRooms = rooms.map((room:any) => ({
-        label: room._id,
-        value: `${room.roomNum}${room.status.occupied ? ' (occupied)' : ''}`
+        label: room.roomNum,
+        value: room._id
       }));
-      // return the guests
+
       return res.json({
         data: rooms,
         keyvalpair: JSON.parse(JSON.stringify(modifiedRooms)),
