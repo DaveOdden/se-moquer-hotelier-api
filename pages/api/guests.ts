@@ -13,7 +13,6 @@ export default async function handler(
   res: NextApiResponse<ResponseData>
 ) {
 
-  // switch the methods
   switch (req.method) {
     case 'GET': {
       return getGuestFormattedByFeature(req, res);
@@ -48,22 +47,17 @@ export default async function handler(
     res: NextApiResponse<any>
   ){
     try {
-      console.log("getGuests");
-      // connect to the database
       let { db } = await connectToDatabase();
-      // fetch the posts
       let guests = await db
           .collection(collectionName)
           .find()
           .toArray();
-      // return the guests
-      console.log(guests);
+
       return res.json({
         message: JSON.parse(JSON.stringify(guests)),
         success: true,
       });
     } catch (error) {
-      // return the error
       return res.json({
         message: new Error(error as any).message,
         success: false,
@@ -76,9 +70,7 @@ export default async function handler(
     res: NextApiResponse<any>
   ){
     try {
-      // connect to the database
       let { db } = await connectToDatabase();
-      // fetch the posts
       let guests = await db
           .collection(collectionName)
           .find()
@@ -87,14 +79,13 @@ export default async function handler(
         label: `${guest.lastName}, ${guest.firstName}`,
         value: `${guest.lastName}, ${guest.firstName}`
       }));
-      // return the guests
+
       return res.json({
         guests: guests,
         keyvalpair: JSON.parse(JSON.stringify(modifiedGuests)),
         success: true,
       });
     } catch (error) {
-      // return the error
       return res.json({
         message: new Error(error as any).message,
         success: false,
@@ -107,17 +98,13 @@ export default async function handler(
     res: NextApiResponse<any>
   ) {
     try {
-      // connect to the database
       let { db } = await connectToDatabase();
-      // add the post
       await db.collection(collectionName).insertOne(JSON.parse(req.body));
-      // return a message
       return res.json({
         message: 'Guest added successfully',
         success: true,
       });
     } catch (error) {
-      // return an error
       return res.json({
         message: new Error(error as any).message,
         success: false,
@@ -130,11 +117,9 @@ export default async function handler(
     res: NextApiResponse<any>
   ) {
     try {
-      // connect to the database
       let { db } = await connectToDatabase();
       let bodyJson = JSON.parse(req.body)
 
-      // update the published status of the post
       await db.collection(collectionName).updateOne(
         {
           _id: new ObjectId(req.query.id)
@@ -142,14 +127,11 @@ export default async function handler(
         { $set: bodyJson }
       );
 
-      // return a message
       return res.json({
         message: 'Guest updated successfully',
         success: true,
       });
     } catch (error) {
-
-      // return an error
       return res.json({
         message: new Error(error as any).message,
         success: false,
@@ -162,22 +144,16 @@ export default async function handler(
     res: NextApiResponse<any>
   ) {
     try {
-      // Connecting to the database
       let { db } = await connectToDatabase();
-
-      // Deleting the post
       await db.collection(collectionName).deleteOne({
         _id: new ObjectId(req.query.id),
       });
 
-      // returning a message
       return res.json({
         message: 'Guest deleted successfully',
         success: true,
       });
     } catch (error) {
-
-      // returning an error
       return res.json({
         message: new Error(error as any).message,
         success: false,

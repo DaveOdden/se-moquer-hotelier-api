@@ -15,34 +15,29 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET': {
-      return getBookings(req, res);
+      return getBookingsByRoom(req, res);
     }
     case 'OPTIONS': {
       return res.status(200).send({message: 'ok'});
     }
   }
 
-  async function getBookings(
+  async function getBookingsByRoom(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ){
     try {
       let { db } = await connectToDatabase();
+      let id = req.query && req.query.id ? req.query.id : '';
       let rooms = await db
           .collection(collectionName)
-          .find()
+          .find({
+            'room._id': parseInt(id.toString())
+          })
           .toArray();
-
-      let arrayOfRoomsBooked: Array<any> = [];
-      rooms.forEach((record: any) => {
-        if(record.room._id) {
-          arrayOfRoomsBooked.push(record.room._id)
-        }
-      });
 
       return res.json({
         message: JSON.parse(JSON.stringify(rooms)),
-        arrayOfRoomsBooked: arrayOfRoomsBooked,
         success: true,
       });
     } catch (error) {
