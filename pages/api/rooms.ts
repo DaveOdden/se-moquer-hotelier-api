@@ -70,7 +70,7 @@ export default async function handler(
           .sort({_id:1})
           .toArray();
       const modifiedRooms = rooms.map((room:any) => ({
-        label: room.roomNum,
+        label: room._id,
         value: `${room.roomNum}${room.status.occupied ? ' (occupied)' : ''}`
       }));
       // return the guests

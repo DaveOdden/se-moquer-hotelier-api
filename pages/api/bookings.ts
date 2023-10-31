@@ -30,9 +30,12 @@ export default async function handler(
       let { db } = await connectToDatabase();
       let rooms = await db
           .collection(collectionName)
-          .find()
+          .find({
+            checkoutDate: {
+              $gte: new Date(new Date().getTime()-60*5*1000).toISOString()
+            }
+          })
           .toArray();
-
 
       let arrayOfRoomsBooked: Array<any> = [];
       rooms.forEach((record: any) => {
@@ -47,7 +50,6 @@ export default async function handler(
         success: true,
       });
     } catch (error) {
-      // return the error
       return res.json({
         message: new Error(error as any).message,
         success: false,
