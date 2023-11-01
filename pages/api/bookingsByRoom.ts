@@ -37,7 +37,7 @@ export default async function handler(
           })
           .toArray();
 
-      function addOneDayToDate(_date: any) {
+      const addOneDayToDate = (_date: any) => {
         const a = dayjs(_date)
         return a.add(1, 'day')
       }
