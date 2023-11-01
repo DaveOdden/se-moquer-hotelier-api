@@ -1,4 +1,5 @@
 const { connectToDatabase } = require('../../lib/mongodb');
+const dayjs = require('dayjs')
 const ObjectId = require('mongodb').ObjectId;
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -36,8 +37,44 @@ export default async function handler(
           })
           .toArray();
 
+      function addOneDayToDate(_date: any) {
+        const a = dayjs(_date)
+        return a.add(1, 'day')
+      }
+      
+      let arrayOfDatesBooked: Array<any> = [];
+      rooms.forEach((record: any) => {
+        console.log('looping');
+        if(dayjs(record.checkinDate).isSame(dayjs(record.checkoutDate), 'day' )) {
+          console.log('date equals');
+          arrayOfDatesBooked.push(dayjs(record.checkinDate).format('YYYY-MM-DD'))
+        }
+        if(dayjs(record.checkinDate).isBefore( dayjs(record.checkoutnDate), 'day') ) {
+          console.log('date has range')
+          //arrayOfDatesBooked.push(dayjs(record.checkinDate).format('YYYY-MM-DD'))
+
+          var dateWithinRange = true;
+          var cyclingDate = dayjs(record.checkinDate);
+          while(dateWithinRange) {
+            console.log('in while loop')
+            if(dayjs(cyclingDate).isSame(dayjs(record.checkoutDate), 'day') ) {
+              arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'))
+              dateWithinRange = false;
+              break;
+            } else if( dayjs(cyclingDate).isBefore( dayjs(record.checkoutDate), 'day' ) ) {
+              arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'));
+              cyclingDate = addOneDayToDate(cyclingDate);
+            }
+          }
+          
+        }
+      });
+
       return res.json({
-        message: JSON.parse(JSON.stringify(rooms)),
+        message: {
+          bookings: JSON.parse(JSON.stringify(rooms)),
+          datesBooked: arrayOfDatesBooked
+        },
         success: true,
       });
     } catch (error) {
