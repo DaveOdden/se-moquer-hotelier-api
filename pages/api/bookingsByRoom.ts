@@ -45,14 +45,14 @@ export default async function handler(
       let arrayOfDatesBooked: Array<any> = [];
       rooms.forEach((record: any) => {
         console.log('looping');
+        console.log(record.checkinDate, record.checkoutDate);
+        console.log(dayjs(record.checkinDate).isBefore( dayjs(record.checkoutDate), 'day') );
         if(dayjs(record.checkinDate).isSame(dayjs(record.checkoutDate), 'day' )) {
           console.log('date equals');
           arrayOfDatesBooked.push(dayjs(record.checkinDate).format('YYYY-MM-DD'))
         }
-        if(dayjs(record.checkinDate).isBefore( dayjs(record.checkoutnDate), 'day') ) {
+        if(dayjs(record.checkinDate).isBefore( dayjs(record.checkoutDate), 'day') ) {
           console.log('date has range')
-          //arrayOfDatesBooked.push(dayjs(record.checkinDate).format('YYYY-MM-DD'))
-
           var dateWithinRange = true;
           var cyclingDate = dayjs(record.checkinDate);
           while(dateWithinRange) {
