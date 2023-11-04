@@ -69,8 +69,16 @@ export default async function handler(
         }
       });
 
+      const roomsWithAvailabilityKeyVal = roomsWithAvailability.map((room:any) => ({
+        label: room.roomNum,
+        value: room._id
+      }));
+
       return res.json({
-        message: roomsWithAvailability,
+        message: {
+          roomsWithAvailability: roomsWithAvailability,
+          roomsWithAvailabilityKeyVal: roomsWithAvailabilityKeyVal
+        },
         success: true,
       });
     } catch (error) {
