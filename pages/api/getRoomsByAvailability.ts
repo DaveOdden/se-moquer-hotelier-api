@@ -37,8 +37,8 @@ export default async function handler(
           .sort({_id:1})
           .toArray();
       
-      const startDate = dayjs(checkinDate)
-      const endDate = dayjs(checkoutDate)
+      const startDate = dayjs(checkinDate).format('YYYY-MM-DD')
+      const endDate = dayjs(checkoutDate).format('YYYY-MM-DD')
       let countOfDays = endDate.diff(checkinDate, 'day', true)
 
       let arrayOfDatesStaying: Array<any> = []
