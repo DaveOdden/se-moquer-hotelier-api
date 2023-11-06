@@ -15,7 +15,7 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET': {
-      return getGuestFormattedByFeature(req, res);
+      return getGuests(req, res);
     }
     case 'POST': {
       return addGuest(req, res);
@@ -28,17 +28,6 @@ export default async function handler(
     }
     case 'OPTIONS': {
       return res.status(200).send({message: 'ok'});
-    }
-  }
-
-  async function getGuestFormattedByFeature(
-    req: NextApiRequest,
-    res: NextApiResponse<any>
-  ) {
-    if(req.query && req.query.for && req.query.for === "keyvaluepair") {
-      return getGuestsForAutoComplete(req, res);
-    } else {
-      return getGuests(req, res);
     }
   }
 
@@ -55,34 +44,6 @@ export default async function handler(
 
       return res.json({
         message: JSON.parse(JSON.stringify(guests)),
-        success: true,
-      });
-    } catch (error) {
-      return res.json({
-        message: new Error(error as any).message,
-        success: false,
-      });
-    }
-  }
-
-  async function getGuestsForAutoComplete(
-    req: NextApiRequest,
-    res: NextApiResponse<any>
-  ){
-    try {
-      let { db } = await connectToDatabase();
-      let guests = await db
-          .collection(collectionName)
-          .find()
-          .toArray();
-      const modifiedGuests = guests.map((guest:any) => ({
-        label: `${guest.lastName}, ${guest.firstName}`,
-        value: `${guest.lastName}, ${guest.firstName}`
-      }));
-
-      return res.json({
-        guests: guests,
-        keyvalpair: JSON.parse(JSON.stringify(modifiedGuests)),
         success: true,
       });
     } catch (error) {
