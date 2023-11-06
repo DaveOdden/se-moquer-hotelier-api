@@ -62,7 +62,17 @@ export default async function handler(
   ){
     try {
       let { db } = await connectToDatabase();
-      await db.collection(collectionName).insertOne(JSON.parse(req.body));
+      let data = JSON.parse(req.body);
+      let guestId = data.guest;
+      let roomId = data.room;
+      data.guest = {
+        _id: new ObjectId(guestId)
+      }
+      data.room = {
+        _id: roomId
+      }
+
+      await db.collection(collectionName).insertOne(data);
 
       return res.json({
         message: 'booking added successfully',
