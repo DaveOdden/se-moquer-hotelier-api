@@ -27,10 +27,9 @@ export default async function handler(
       let { db } = await connectToDatabase();
       let guest = await db
           .collection(collectionName)
-          .find({
+          .findOne({
             _id: new ObjectId(req.query.id)
           })
-          .toArray();
 
       return res.json({
         message: JSON.parse(JSON.stringify(guest)),
