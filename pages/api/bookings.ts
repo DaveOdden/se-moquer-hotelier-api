@@ -17,6 +17,9 @@ export default async function handler(
     case 'GET': {
       return getBookings(req, res);
     }
+    case 'POST': {
+      return addBooking(req, res);
+    }
     case 'OPTIONS': {
       return res.status(200).send({message: 'ok'});
     }
@@ -43,6 +46,26 @@ export default async function handler(
       return res.json({
         message: JSON.parse(JSON.stringify(rooms)),
         arrayOfRoomsBooked: arrayOfRoomsBooked,
+        success: true,
+      });
+    } catch (error) {
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
+  }
+
+  async function addBooking(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ){
+    try {
+      let { db } = await connectToDatabase();
+      await db.collection(collectionName).insertOne(JSON.parse(req.body));
+
+      return res.json({
+        message: 'booking added successfully',
         success: true,
       });
     } catch (error) {
