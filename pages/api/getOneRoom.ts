@@ -15,37 +15,24 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET': {
-      return getRooms(req, res);
-    }
-    case 'OPTIONS': {
-      return res.status(200).send({message: 'ok'});
+      return getOneRoom(req, res);
     }
   }
 
-  async function getRooms(
+  async function getOneRoom(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ){
     try {
       let { db } = await connectToDatabase();
-      let rooms;
-
-      if(req.query.id) {
-        rooms = await db
-          .collection(collectionName)
-          .findOne({
-            _id: parseInt(req.query.id as any)
-          })
-      } else {
-        rooms = await db
-          .collection(collectionName)
-          .find()
-          .sort({_id:1})
-          .toArray(); 
-      }
+      let guest = await db
+        .collection(collectionName)
+        .findOne({
+          _id: parseInt(req.query.id as any)
+        })
 
       return res.json({
-        message: JSON.parse(JSON.stringify(rooms)),
+        message: JSON.parse(JSON.stringify(guest)),
         success: true,
       });
     } catch (error) {

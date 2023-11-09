@@ -15,40 +15,34 @@ export default async function handler(
 
   switch (req.method) {
     case 'GET': {
-      return getRooms(req, res);
-    }
-    case 'OPTIONS': {
-      return res.status(200).send({message: 'ok'});
+      return getRoomsForAutoComplete(req, res);
     }
   }
 
-  async function getRooms(
+  async function getRoomsForAutoComplete(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ){
     try {
       let { db } = await connectToDatabase();
-      let rooms;
-
-      if(req.query.id) {
-        rooms = await db
-          .collection(collectionName)
-          .findOne({
-            _id: parseInt(req.query.id as any)
-          })
-      } else {
-        rooms = await db
+      let rooms = await db
           .collection(collectionName)
           .find()
           .sort({_id:1})
-          .toArray(); 
-      }
+          .toArray();
+          
+      const modifiedRooms = rooms.map((room:any) => ({
+        label: room.roomNum,
+        value: room._id
+      }));
 
       return res.json({
-        message: JSON.parse(JSON.stringify(rooms)),
+        data: rooms,
+        keyvalpair: JSON.parse(JSON.stringify(modifiedRooms)),
         success: true,
       });
     } catch (error) {
+      // return the error
       return res.json({
         message: new Error(error as any).message,
         success: false,
