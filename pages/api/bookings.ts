@@ -1,4 +1,5 @@
 const { connectToDatabase } = require('../../lib/mongodb');
+const dayjs = require('dayjs')
 const ObjectId = require('mongodb').ObjectId;
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -72,6 +73,53 @@ export default async function handler(
         _id: roomId
       }
 
+
+
+
+
+      const addOneDayToDate = (_date: any) => {
+        const a = dayjs(_date)
+        return a.add(1, 'day')
+      }
+      
+      let arrayOfDatesBooked: Array<any> = [];
+
+      if(dayjs(data.checkinDate).isSame(dayjs(data.checkoutDate), 'day' )) {
+        arrayOfDatesBooked.push(dayjs(data.checkinDate).format('YYYY-MM-DD'))
+      }
+      if(dayjs(data.checkinDate).isBefore( dayjs(data.checkoutDate), 'day') ) {
+        var dateWithinRange = true;
+        var cyclingDate = dayjs(data.checkinDate);
+        while(dateWithinRange) {
+          if(dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), 'day') ) {
+            arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'))
+            dateWithinRange = false;
+            break;
+          } else if( dayjs(cyclingDate).isBefore( dayjs(data.checkoutDate), 'day' ) ) {
+            arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'));
+            cyclingDate = addOneDayToDate(cyclingDate);
+          }
+        }
+        
+      }
+
+      // update corresponding room record with dates
+      await db.collection("rooms").updateOne({
+        _id: roomId
+      },{ 
+        $push: { "datesBooked": { $each : arrayOfDatesBooked } } 
+      });
+
+      // update corresponding guest record with history
+      let bookingData = structuredClone(data);
+      delete bookingData.guest;
+      await db.collection("guests").updateOne({
+        _id: new ObjectId(guestId)
+      },{ 
+        $push: { "history": bookingData } 
+      });
+
+      // insert booking
       await db.collection(collectionName).insertOne(data);
 
       return res.json({
