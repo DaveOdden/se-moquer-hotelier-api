@@ -186,6 +186,10 @@ export default async function handler(
         },{ 
           $push: { history: { action: 'Cancelled Booking', booking: bookingInfo } } 
         });
+
+        await db.collection(collectionName).deleteOne({
+          _id: new ObjectId(req.query.id),
+        });
       }
 
       return res.json({
