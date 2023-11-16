@@ -21,6 +21,9 @@ export default async function handler(
     case 'POST': {
       return addBooking(req, res);
     }
+    case 'DELETE': {
+      return deleteBooking(req, res);
+    }
     case 'OPTIONS': {
       return res.status(200).send({message: 'ok'});
     }
@@ -73,10 +76,6 @@ export default async function handler(
         _id: roomId
       }
 
-
-
-
-
       const addOneDayToDate = (_date: any) => {
         const a = dayjs(_date)
         return a.add(1, 'day')
@@ -116,7 +115,7 @@ export default async function handler(
       await db.collection("guests").updateOne({
         _id: new ObjectId(guestId)
       },{ 
-        $push: { "history": bookingData } 
+        $push: { history: { action: 'New Booking', booking: bookingData } } 
       });
 
       // insert booking
@@ -133,4 +132,72 @@ export default async function handler(
       });
     }
   }
+
+  async function deleteBooking(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ) {
+    try {
+      let { db } = await connectToDatabase();
+      let roomInfo: any;
+
+      const addOneDayToDate = (_date: any) => {
+        const a = dayjs(_date)
+        return a.add(1, 'day')
+      }
+
+      let bookingInfo = await db
+        .collection(collectionName)
+        .findOne({
+          _id: new ObjectId(req.query.id)
+        })
+
+      let arrayOfDatesBooked: Array<any> = [];
+      if(dayjs(bookingInfo.checkinDate).isSame(dayjs(bookingInfo.checkoutDate), 'day' )) {
+        arrayOfDatesBooked.push(dayjs(bookingInfo.checkinDate).format('YYYY-MM-DD'))
+      }
+      if(dayjs(bookingInfo.checkinDate).isBefore( dayjs(bookingInfo.checkoutDate), 'day') ) {
+        var dateWithinRange = true;
+        var cyclingDate = dayjs(bookingInfo.checkinDate);
+        while(dateWithinRange) {
+          if(dayjs(cyclingDate).isSame(dayjs(bookingInfo.checkoutDate), 'day') ) {
+            arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'))
+            dateWithinRange = false;
+            break;
+          } else if( dayjs(cyclingDate).isBefore( dayjs(bookingInfo.checkoutDate), 'day' ) ) {
+            arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'));
+            cyclingDate = addOneDayToDate(cyclingDate);
+          }
+        }
+      }
+
+      let removeDatesFromRoom;
+      if(bookingInfo.room._id) {
+        removeDatesFromRoom = await db.collection('rooms').updateOne({
+          _id: parseInt(bookingInfo.room._id),
+        }, {
+          $pull: { datesBooked: {$in: arrayOfDatesBooked } }
+        });
+      }
+
+      if(removeDatesFromRoom.modifiedCount && bookingInfo.guest._id) {
+        await db.collection("guests").updateOne({
+          _id: new ObjectId(bookingInfo.guest._id)
+        },{ 
+          $push: { history: { action: 'Cancelled Booking', booking: bookingInfo } } 
+        });
+      }
+
+      return res.json({
+        message: 'Booking deleted successfully',
+        success: true,
+      });
+    } catch (error) {
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
+  }
+
 }
