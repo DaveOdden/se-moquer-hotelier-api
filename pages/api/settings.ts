@@ -39,9 +39,7 @@ export default async function handler(
       } else {
         settings = await db
           .collection(collectionName)
-          .find()
-          .sort({_id:1})
-          .toArray(); 
+          .findOne()
       }
 
       return res.json({
