@@ -71,7 +71,8 @@ export default async function handler(
 
       const roomsWithAvailabilityKeyVal = roomsWithAvailability.map((room:any) => ({
         label: room.roomNum,
-        value: room._id
+        value: room.roomNum,
+        id: room._id
       }));
 
       return res.json({
