@@ -77,27 +77,31 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
-    try {
-      let { db } = await connectToDatabase();
-      let bodyJson = JSON.parse(req.body)
+    // try {
+    //   let { db } = await connectToDatabase();
+    //   let bodyJson = JSON.parse(req.body)
 
-      await db.collection(collectionName).updateOne(
-        {
-          _id: new ObjectId(req.query.id)
-        },
-        { $set: bodyJson }
-      );
+    //   await db.collection(collectionName).updateOne(
+    //     {
+    //       _id: new ObjectId(req.query.id)
+    //     },
+    //     { $set: bodyJson }
+    //   );
 
-      return res.json({
-        message: 'Guest updated successfully',
-        success: true,
-      });
-    } catch (error) {
-      return res.json({
-        message: new Error(error as any).message,
-        success: false,
-      });
-    }
+    //   return res.json({
+    //     message: 'Guest updated successfully',
+    //     success: true,
+    //   });
+    // } catch (error) {
+    //   return res.json({
+    //     message: new Error(error as any).message,
+    //     success: false,
+    //   });
+    // }
+    return res.json({
+      message: new Error(error as any).message,
+      success: false,
+    });
   }
 
   async function deleteGuest(
