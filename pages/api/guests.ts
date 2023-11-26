@@ -99,7 +99,7 @@ export default async function handler(
     //   });
     // }
     return res.json({
-      message: new Error(error as any).message,
+      message: new Error().message,
       success: false,
     });
   }
