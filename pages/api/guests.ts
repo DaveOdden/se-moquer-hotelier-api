@@ -60,11 +60,14 @@ export default async function handler(
   ) {
     try {
       let { db } = await connectToDatabase();
-      await db.collection(collectionName).insertOne(JSON.parse(req.body));
-      return res.json({
-        message: 'Guest added successfully',
-        success: true,
-      });
+      let res = await db.collection(collectionName+'ds').insertOne(JSON.parse(req.body));
+      if(await res.acknowledged) {
+        return res.json({
+          message: 'Guest added successfully',
+          success: true,
+        });
+      }
+      throw new Error("addGuest endpoint error");
     } catch (error) {
       return res.json({
         message: new Error(error as any).message,
@@ -77,31 +80,30 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
   ) {
-    // try {
-    //   let { db } = await connectToDatabase();
-    //   let bodyJson = JSON.parse(req.body)
+    try {
+      let { db } = await connectToDatabase();
+      let bodyJson = JSON.parse(req.body)
 
-    //   await db.collection(collectionName).updateOne(
-    //     {
-    //       _id: new ObjectId(req.query.id)
-    //     },
-    //     { $set: bodyJson }
-    //   );
+      let dbResult = await db.collection(collectionName).updateOne(
+        {
+          _id: new ObjectId(req.query.id)
+        },
+        { $set: bodyJson }
+      );
 
-    //   return res.json({
-    //     message: 'Guest updated successfully',
-    //     success: true,
-    //   });
-    // } catch (error) {
-    //   return res.json({
-    //     message: new Error(error as any).message,
-    //     success: false,
-    //   });
-    // }
-    return res.json({
-      message: new Error().message,
-      success: false,
-    });
+      if(await dbResult.modifiedCount > 0) {
+        return res.json({
+          message: 'Guest updated successfully',
+          success: true,
+        });
+      }
+      throw new Error("updateGuest endpoint error");
+    } catch (error) {
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
   }
 
   async function deleteGuest(
@@ -110,14 +112,17 @@ export default async function handler(
   ) {
     try {
       let { db } = await connectToDatabase();
-      await db.collection(collectionName).deleteOne({
+      let dbResult = await db.collection(collectionName).deleteOne({
         _id: new ObjectId(req.query.id),
       });
 
-      return res.json({
-        message: 'Guest deleted successfully',
-        success: true,
-      });
+      if(await dbResult.deletedCount > 0) {
+        return res.json({
+          message: 'Guest deleted successfully',
+          success: true,
+        });
+      }
+      throw new Error("deleteGuest endpoint error");
     } catch (error) {
       return res.json({
         message: new Error(error as any).message,
