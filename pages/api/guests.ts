@@ -60,8 +60,8 @@ export default async function handler(
   ) {
     try {
       let { db } = await connectToDatabase();
-      let res = await db.collection(collectionName).insertOne(JSON.parse(req.body));
-      if(await res.acknowledged) {
+      let dbResult = await db.collection(collectionName).insertOne(JSON.parse(req.body));
+      if(await dbResult.acknowledged) {
         return res.json({
           message: 'Guest added successfully',
           success: true,
