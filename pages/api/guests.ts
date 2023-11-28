@@ -116,6 +116,8 @@ export default async function handler(
         _id: new ObjectId(req.query.id),
       });
 
+      console.log(dbResult)
+
       if(await dbResult.deletedCount > 0) {
         return res.json({
           message: 'Guest deleted successfully',

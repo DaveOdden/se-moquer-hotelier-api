@@ -1,5 +1,6 @@
 const { connectToDatabase } = require('../../lib/mongodb');
 const dayjs = require('dayjs')
+const util = require('./util/util')
 const ObjectId = require('mongodb').ObjectId;
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -20,6 +21,9 @@ export default async function handler(
     }
     case 'POST': {
       return addBooking(req, res);
+    }
+    case 'PUT': {
+      return updateBooking(req, res);
     }
     case 'DELETE': {
       return deleteBooking(req, res);
@@ -133,6 +137,69 @@ export default async function handler(
     }
   }
 
+  async function updateBooking(
+    req: NextApiRequest,
+    res: NextApiResponse<any>
+  ) {
+    try {
+      let { db } = await connectToDatabase();
+      let bodyJson = JSON.parse(req.body)
+      let newData = structuredClone(bodyJson)
+      delete newData._id
+
+      // get original booking data
+      let thisBooking = await db
+        .collection(collectionName)
+        .findOne({
+          _id: new ObjectId(req.query.id)
+        })
+
+      let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
+      let newDatesBooked = util.getArrayOfDatesBooked(newData)
+
+      // update booking
+      let dbResult = await db.collection(collectionName).updateOne({
+        _id: new ObjectId(req.query.id)
+      },{ 
+        $set: newData
+      });
+
+      // remove original booked dates from room's datesBooked array
+      let removeDatesFromRoom;
+      if(thisBooking.room._id) {
+        removeDatesFromRoom = await db.collection('rooms').updateOne({
+          _id: parseInt(thisBooking.room._id),
+        }, {
+          $pull: { datesBooked: {$in: originalDatesBooked } },
+        });
+      }
+
+      // add booked dates to new room
+      removeDatesFromRoom = await db.collection('rooms').updateOne({
+        _id: parseInt(bodyJson.room._id),
+      }, {
+        $push: { datesBooked: { $each : newDatesBooked }  } 
+      });
+
+      // update guest history
+      await db.collection("guests").updateOne({
+        _id: new ObjectId(bodyJson.guest._id)
+      },{ 
+        $push: { history: { action: 'Booking Updated', booking: bodyJson } } 
+      });
+
+      return res.json({
+        message: 'Booking updated successfully',
+        success: true,
+      });
+    } catch (error) {
+      return res.json({
+        message: new Error(error as any).message,
+        success: false,
+      });
+    }
+  }
+
   async function deleteBooking(
     req: NextApiRequest,
     res: NextApiResponse<any>
@@ -152,7 +219,7 @@ export default async function handler(
           _id: new ObjectId(req.query.id)
         })
 
-      let arrayOfDatesBooked: Array<any> = [];
+      let arrayOfDatesBooked: Array<string> = [];
       if(dayjs(bookingInfo.checkinDate).isSame(dayjs(bookingInfo.checkoutDate), 'day' )) {
         arrayOfDatesBooked.push(dayjs(bookingInfo.checkinDate).format('YYYY-MM-DD'))
       }
