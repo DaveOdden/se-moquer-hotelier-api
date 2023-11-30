@@ -19,31 +19,31 @@ export default async function handler(
       return getRoomsByAvailability(req, res);
     }
     case 'OPTIONS': {
-      return res.status(200).send({message: 'ok'});
+      return res.status(200).send({ message: 'ok' });
     }
   }
 
   async function getRoomsByAvailability(
     req: NextApiRequest,
     res: NextApiResponse<any>
-  ){
+  ) {
     try {
       let { db } = await connectToDatabase();
       let checkinDate = req.query && req.query.checkin ? req.query.checkin : '';
       let checkoutDate = req.query && req.query.checkout ? req.query.checkout : '';
       let rooms = await db
-          .collection(collectionName)
-          .find()
-          .sort({_id:1})
-          .toArray();
-      
+        .collection(collectionName)
+        .find()
+        .sort({ _id: 1 })
+        .toArray();
+
       const startDate = dayjs(checkinDate)
       const endDate = dayjs(checkoutDate)
       let countOfDays = endDate.diff(checkinDate, 'day', true)
 
       let arrayOfDatesStaying: Array<any> = []
-      for(let x = 0; x <= countOfDays; x++) {
-        if(x === 0) {
+      for (let x = 0; x <= countOfDays; x++) {
+        if (x === 0) {
           arrayOfDatesStaying.push(startDate.format('YYYY-MM-DD'))
         } else {
           arrayOfDatesStaying.push(startDate.add(x, 'day').format('YYYY-MM-DD'))
@@ -53,25 +53,24 @@ export default async function handler(
       let roomsWithAvailability: Array<any> = [];
       rooms.forEach((room: any) => {
         let roomIsOccupied = false;
-        if(room.hasOwnProperty('datesBooked')) {
-          for(let y = 0; y < arrayOfDatesStaying.length; y++) {
-            console.log(room.datesBooked.indexOf(arrayOfDatesStaying[y]) + ' -> ' + arrayOfDatesStaying[y])
-            if(room.datesBooked.indexOf(arrayOfDatesStaying[y]) > -1) {
+        if (room.hasOwnProperty('datesBooked')) {
+          for (let y = 0; y < arrayOfDatesStaying.length; y++) {
+            if (room.datesBooked.indexOf(arrayOfDatesStaying[y]) > -1) {
               roomIsOccupied = true
               break;
             }
           }
-          if(!roomIsOccupied) {
+          if (!roomIsOccupied) {
             roomsWithAvailability.push(room)
           }
         } else {
-          roomsWithAvailability.push(room)     
+          roomsWithAvailability.push(room)
         }
       });
 
-      const roomsWithAvailabilityKeyVal = roomsWithAvailability.map((room:any) => ({
-        label: room.roomNum,
-        value: room.roomNum,
+      const roomsWithAvailabilityKeyVal = roomsWithAvailability.map((room: any) => ({
+        label: room.roomNum.toString(),
+        value: room.roomNum.toString(),
         id: room._id
       }));
 

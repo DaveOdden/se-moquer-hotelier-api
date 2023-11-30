@@ -22,18 +22,18 @@ export default async function handler(
   async function getRoomsForAutoComplete(
     req: NextApiRequest,
     res: NextApiResponse<any>
-  ){
+  ) {
     try {
       let { db } = await connectToDatabase();
       let rooms = await db
-          .collection(collectionName)
-          .find()
-          .sort({_id:1})
-          .toArray();
-          
-      const modifiedRooms = rooms.map((room:any) => ({
+        .collection(collectionName)
+        .find()
+        .sort({ _id: 1 })
+        .toArray();
+
+      const modifiedRooms = rooms.map((room: any) => ({
         label: room.roomNum,
-        value: room._id
+        value: room._id.toString()
       }));
 
       return res.json({
