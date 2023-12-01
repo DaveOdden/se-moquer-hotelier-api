@@ -154,8 +154,16 @@ export default async function handler(
           _id: new ObjectId(req.query.id)
         })
 
+      if (newData.checkinDate === undefined) {
+        newData.checkinDate = thisBooking.checkinDate
+      }
+
+      if (newData.checkoutDate === undefined) {
+        newData.checkoutDate = thisBooking.checkoutDate
+      }
+
       let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
-      let newDatesBooked = util.getArrayOfDatesBooked(newData)
+      let newDatesBooked = util.getArrayOfDatesBooked(newData) // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
 
       // update booking
       let dbResult = await db.collection(collectionName).updateOne({
@@ -163,6 +171,10 @@ export default async function handler(
       }, {
         $set: newData
       });
+
+      console.log(originalDatesBooked)
+      console.log(newDatesBooked)
+      console.log(originalDatesBooked !== newDatesBooked)
 
       // remove original booked dates from room's datesBooked array
       let removeDatesFromRoom;
@@ -175,7 +187,7 @@ export default async function handler(
         });
       }
 
-      // add booked dates to new room
+      // add booked dates to new room ***** ROOM IS EXPECTED IN PAYLOAD
       let addDatesToNewRoom = await db.collection('rooms').updateOne({
         _id: parseInt(bodyJson.room._id),
       }, {
@@ -184,7 +196,7 @@ export default async function handler(
 
       // update guest history
       await db.collection("guests").updateOne({
-        _id: new ObjectId(bodyJson.guest._id)
+        _id: new ObjectId(thisBooking.guest._id)
       }, {
         $push: { history: { action: 'Booking Updated', booking: bodyJson } }
       });
