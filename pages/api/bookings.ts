@@ -188,7 +188,7 @@ export default async function handler(
 
       // add booked dates to new room
       let addDatesToRoom = await db.collection('rooms').updateOne({
-        _id: parseInt(bodyJson.room._id),
+        _id: parseInt(newData.room._id),
       }, {
         $push: { datesBooked: { $each: newDatesBooked } }
       });
@@ -196,9 +196,9 @@ export default async function handler(
 
       // update guest history
       await db.collection("guests").updateOne({
-        _id: new ObjectId(bodyJson.guest._id)
+        _id: new ObjectId(newData.guest._id)
       }, {
-        $push: { history: { action: 'Booking Updated', booking: bodyJson } }
+        $push: { history: { action: 'Booking Updated', booking: newData } }
       });
 
       return res.json({
