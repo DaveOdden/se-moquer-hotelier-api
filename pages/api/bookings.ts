@@ -29,24 +29,24 @@ export default async function handler(
       return deleteBooking(req, res);
     }
     case 'OPTIONS': {
-      return res.status(200).send({message: 'ok'});
+      return res.status(200).send({ message: 'ok' });
     }
   }
 
   async function getBookings(
     req: NextApiRequest,
     res: NextApiResponse<any>
-  ){
+  ) {
     try {
       let { db } = await connectToDatabase();
       let rooms = await db
-          .collection(collectionName)
-          .find()
-          .toArray();
+        .collection(collectionName)
+        .find()
+        .toArray();
 
       let arrayOfRoomsBooked: Array<any> = [];
       rooms.forEach((record: any) => {
-        if(record.room._id) {
+        if (record.room._id) {
           arrayOfRoomsBooked.push(record.room._id)
         }
       });
@@ -67,7 +67,7 @@ export default async function handler(
   async function addBooking(
     req: NextApiRequest,
     res: NextApiResponse<any>
-  ){
+  ) {
     try {
       let { db } = await connectToDatabase();
       let data = JSON.parse(req.body);
@@ -84,33 +84,33 @@ export default async function handler(
         const a = dayjs(_date)
         return a.add(1, 'day')
       }
-      
+
       let arrayOfDatesBooked: Array<any> = [];
 
-      if(dayjs(data.checkinDate).isSame(dayjs(data.checkoutDate), 'day' )) {
+      if (dayjs(data.checkinDate).isSame(dayjs(data.checkoutDate), 'day')) {
         arrayOfDatesBooked.push(dayjs(data.checkinDate).format('YYYY-MM-DD'))
       }
-      if(dayjs(data.checkinDate).isBefore( dayjs(data.checkoutDate), 'day') ) {
+      if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), 'day')) {
         var dateWithinRange = true;
         var cyclingDate = dayjs(data.checkinDate);
-        while(dateWithinRange) {
-          if(dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), 'day') ) {
+        while (dateWithinRange) {
+          if (dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), 'day')) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'))
             dateWithinRange = false;
             break;
-          } else if( dayjs(cyclingDate).isBefore( dayjs(data.checkoutDate), 'day' ) ) {
+          } else if (dayjs(cyclingDate).isBefore(dayjs(data.checkoutDate), 'day')) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'));
             cyclingDate = addOneDayToDate(cyclingDate);
           }
         }
-        
+
       }
 
       // update corresponding room record with dates
       await db.collection("rooms").updateOne({
         _id: roomId
-      },{ 
-        $push: { "datesBooked": { $each : arrayOfDatesBooked } } 
+      }, {
+        $push: { "datesBooked": { $each: arrayOfDatesBooked } }
       });
 
       // update corresponding guest record with history
@@ -118,8 +118,8 @@ export default async function handler(
       delete bookingData.guest;
       await db.collection("guests").updateOne({
         _id: new ObjectId(guestId)
-      },{ 
-        $push: { history: { action: 'New Booking', booking: bookingData } } 
+      }, {
+        $push: { history: { action: 'New Booking', booking: bookingData } }
       });
 
       // insert booking
@@ -160,17 +160,17 @@ export default async function handler(
       // update booking
       let dbResult = await db.collection(collectionName).updateOne({
         _id: new ObjectId(req.query.id)
-      },{ 
+      }, {
         $set: newData
       });
 
       // remove original booked dates from room's datesBooked array
       let removeDatesFromRoom;
-      if(thisBooking.room._id) {
+      if (thisBooking.room._id) {
         removeDatesFromRoom = await db.collection('rooms').updateOne({
           _id: parseInt(thisBooking.room._id),
         }, {
-          $pull: { datesBooked: {$in: originalDatesBooked } },
+          $pull: { datesBooked: { $in: originalDatesBooked } },
         });
       }
 
@@ -178,14 +178,14 @@ export default async function handler(
       removeDatesFromRoom = await db.collection('rooms').updateOne({
         _id: parseInt(bodyJson.room._id),
       }, {
-        $push: { datesBooked: { $each : newDatesBooked }  } 
+        $push: { datesBooked: { $each: newDatesBooked } }
       });
 
       // update guest history
       await db.collection("guests").updateOne({
         _id: new ObjectId(bodyJson.guest._id)
-      },{ 
-        $push: { history: { action: 'Booking Updated', booking: bodyJson } } 
+      }, {
+        $push: { history: { action: 'Booking Updated', booking: bodyJson } }
       });
 
       return res.json({
@@ -219,19 +219,20 @@ export default async function handler(
           _id: new ObjectId(req.query.id)
         })
 
+      console.log(bookingInfo)
       let arrayOfDatesBooked: Array<string> = [];
-      if(dayjs(bookingInfo.checkinDate).isSame(dayjs(bookingInfo.checkoutDate), 'day' )) {
+      if (dayjs(bookingInfo.checkinDate).isSame(dayjs(bookingInfo.checkoutDate), 'day')) {
         arrayOfDatesBooked.push(dayjs(bookingInfo.checkinDate).format('YYYY-MM-DD'))
       }
-      if(dayjs(bookingInfo.checkinDate).isBefore( dayjs(bookingInfo.checkoutDate), 'day') ) {
+      if (dayjs(bookingInfo.checkinDate).isBefore(dayjs(bookingInfo.checkoutDate), 'day')) {
         var dateWithinRange = true;
         var cyclingDate = dayjs(bookingInfo.checkinDate);
-        while(dateWithinRange) {
-          if(dayjs(cyclingDate).isSame(dayjs(bookingInfo.checkoutDate), 'day') ) {
+        while (dateWithinRange) {
+          if (dayjs(cyclingDate).isSame(dayjs(bookingInfo.checkoutDate), 'day')) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'))
             dateWithinRange = false;
             break;
-          } else if( dayjs(cyclingDate).isBefore( dayjs(bookingInfo.checkoutDate), 'day' ) ) {
+          } else if (dayjs(cyclingDate).isBefore(dayjs(bookingInfo.checkoutDate), 'day')) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format('YYYY-MM-DD'));
             cyclingDate = addOneDayToDate(cyclingDate);
           }
@@ -239,19 +240,19 @@ export default async function handler(
       }
 
       let removeDatesFromRoom;
-      if(bookingInfo.room._id) {
+      if (bookingInfo.room._id >= 0) {
         removeDatesFromRoom = await db.collection('rooms').updateOne({
           _id: parseInt(bookingInfo.room._id),
         }, {
-          $pull: { datesBooked: {$in: arrayOfDatesBooked } }
+          $pull: { datesBooked: { $in: arrayOfDatesBooked } }
         });
       }
 
-      if(removeDatesFromRoom.modifiedCount && bookingInfo.guest._id) {
+      if (removeDatesFromRoom.modifiedCount && bookingInfo.guest._id) {
         await db.collection("guests").updateOne({
           _id: new ObjectId(bookingInfo.guest._id)
-        },{ 
-          $push: { history: { action: 'Cancelled Booking', booking: bookingInfo } } 
+        }, {
+          $push: { history: { action: 'Cancelled Booking', booking: bookingInfo } }
         });
 
         await db.collection(collectionName).deleteOne({
