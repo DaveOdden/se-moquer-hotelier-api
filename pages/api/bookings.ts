@@ -166,20 +166,24 @@ export default async function handler(
 
       // remove original booked dates from room's datesBooked array
       let removeDatesFromRoom;
+      console.log(thisBooking.room._id)
       if (thisBooking.room._id) {
+        console.log(thisBooking.room._id)
         removeDatesFromRoom = await db.collection('rooms').updateOne({
           _id: parseInt(thisBooking.room._id),
         }, {
           $pull: { datesBooked: { $in: originalDatesBooked } },
         });
       }
+      console.log(removeDatesFromRoom)
 
       // add booked dates to new room
-      removeDatesFromRoom = await db.collection('rooms').updateOne({
+      let addDatesToRoom = await db.collection('rooms').updateOne({
         _id: parseInt(bodyJson.room._id),
       }, {
         $push: { datesBooked: { $each: newDatesBooked } }
       });
+      console.log(addDatesToRoom)
 
       // update guest history
       await db.collection("guests").updateOne({
@@ -219,7 +223,6 @@ export default async function handler(
           _id: new ObjectId(req.query.id)
         })
 
-      console.log(bookingInfo)
       let arrayOfDatesBooked: Array<string> = [];
       if (dayjs(bookingInfo.checkinDate).isSame(dayjs(bookingInfo.checkoutDate), 'day')) {
         arrayOfDatesBooked.push(dayjs(bookingInfo.checkinDate).format('YYYY-MM-DD'))
