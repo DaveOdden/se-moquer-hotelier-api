@@ -146,15 +146,6 @@ export default async function handler(
       let bodyJson = JSON.parse(req.body)
       let newData = structuredClone(bodyJson)
       delete newData._id
-      let guestId = newData.guest;
-      let roomId = newData.room;
-      newData.guest = {
-        _id: new ObjectId(guestId)
-      }
-      newData.room = {
-        _id: roomId
-      }
-
 
       // get original booking data
       let thisBooking = await db
@@ -177,28 +168,25 @@ export default async function handler(
       let removeDatesFromRoom;
       console.log(thisBooking.room._id)
       if (thisBooking.room._id) {
-        console.log(thisBooking.room._id)
         removeDatesFromRoom = await db.collection('rooms').updateOne({
           _id: parseInt(thisBooking.room._id),
         }, {
           $pull: { datesBooked: { $in: originalDatesBooked } },
         });
       }
-      console.log(removeDatesFromRoom)
 
       // add booked dates to new room
-      let addDatesToRoom = await db.collection('rooms').updateOne({
-        _id: parseInt(newData.room._id),
+      let addDatesToNewRoom = await db.collection('rooms').updateOne({
+        _id: parseInt(bodyJson.room._id),
       }, {
         $push: { datesBooked: { $each: newDatesBooked } }
       });
-      console.log(addDatesToRoom)
 
       // update guest history
       await db.collection("guests").updateOne({
-        _id: new ObjectId(newData.guest._id)
+        _id: new ObjectId(bodyJson.guest._id)
       }, {
-        $push: { history: { action: 'Booking Updated', booking: newData } }
+        $push: { history: { action: 'Booking Updated', booking: bodyJson } }
       });
 
       return res.json({
