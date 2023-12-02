@@ -142,21 +142,14 @@ export default async function handler(
     res: NextApiResponse<any>
   ) {
     try {
-      console.log('updateBooking')
       let { db } = await connectToDatabase();
-      console.log('db')
-      console.log(req.body)
       let bodyJson = JSON.parse(req.body)
-      console.log('bodyJson')
-      console.log(bodyJson)
       let newData = structuredClone(bodyJson)
       // delete newData._id
       let roomId = bodyJson.room;
       newData.room = {
         _id: roomId
       }
-
-      console.log(newData)
 
       // get original booking data
       let thisBooking = await db
@@ -176,8 +169,6 @@ export default async function handler(
       let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
       let newDatesBooked = util.getArrayOfDatesBooked(newData) // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
 
-      console.log(newData)
-
       // update booking
       let dbResult = await db.collection(collectionName).updateOne({
         _id: new ObjectId(req.query.id)
@@ -186,13 +177,10 @@ export default async function handler(
       });
 
       console.log(originalDatesBooked)
-      console.log(newDatesBooked)
-      console.log(originalDatesBooked !== newDatesBooked)
-
       // remove original booked dates from room's datesBooked array
       let removeDatesFromRoom;
       console.log(thisBooking.room._id)
-      if (thisBooking.room._id) {
+      if (thisBooking.room._id >= 0) {
         removeDatesFromRoom = await db.collection('rooms').updateOne({
           _id: parseInt(thisBooking.room._id),
         }, {
@@ -200,12 +188,15 @@ export default async function handler(
         });
       }
 
+      console.log(newDatesBooked)
+      console.log(bodyJson.room)
       // add booked dates to new room ***** ROOM IS EXPECTED IN PAYLOAD
       let addDatesToNewRoom = await db.collection('rooms').updateOne({
         _id: parseInt(bodyJson.room),
       }, {
         $push: { datesBooked: { $each: newDatesBooked } }
       });
+      console.log(addDatesToNewRoom)
 
       // update guest history
       await db.collection("guests").updateOne({
