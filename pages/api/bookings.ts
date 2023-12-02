@@ -189,7 +189,7 @@ export default async function handler(
 
       // add booked dates to new room ***** ROOM IS EXPECTED IN PAYLOAD
       let addDatesToNewRoom = await db.collection('rooms').updateOne({
-        _id: parseInt(bodyJson.room._id),
+        _id: parseInt(bodyJson.room),
       }, {
         $push: { datesBooked: { $each: newDatesBooked } }
       });
