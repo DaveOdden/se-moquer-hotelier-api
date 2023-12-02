@@ -146,6 +146,10 @@ export default async function handler(
       let bodyJson = JSON.parse(req.body)
       let newData = structuredClone(bodyJson)
       delete newData._id
+      let roomId = bodyJson.room;
+      bodyJson.room = {
+        _id: roomId
+      }
 
       // get original booking data
       let thisBooking = await db
