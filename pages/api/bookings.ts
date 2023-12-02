@@ -142,14 +142,21 @@ export default async function handler(
     res: NextApiResponse<any>
   ) {
     try {
+      console.log('updateBooking')
       let { db } = await connectToDatabase();
+      console.log('db')
+      console.log(req.body)
       let bodyJson = JSON.parse(req.body)
+      console.log('bodyJson')
+      console.log(bodyJson)
       let newData = structuredClone(bodyJson)
-      delete newData._id
+      // delete newData._id
       let roomId = bodyJson.room;
       newData.room = {
         _id: roomId
       }
+
+      console.log(newData)
 
       // get original booking data
       let thisBooking = await db
@@ -168,6 +175,8 @@ export default async function handler(
 
       let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
       let newDatesBooked = util.getArrayOfDatesBooked(newData) // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
+
+      console.log(newData)
 
       // update booking
       let dbResult = await db.collection(collectionName).updateOne({
