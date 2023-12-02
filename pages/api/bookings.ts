@@ -147,7 +147,7 @@ export default async function handler(
       let newData = structuredClone(bodyJson)
       delete newData._id
       let roomId = bodyJson.room;
-      bodyJson.room = {
+      newData.room = {
         _id: roomId
       }
 
