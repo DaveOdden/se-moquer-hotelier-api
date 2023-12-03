@@ -2,7 +2,7 @@
 const nextConfig = {
   async headers() {
     const corsAccessControl = [
-      { key: "Authorization", value: "*" },
+      { key: "Authorization", value: process.env.DATA_API_KEY },
       { key: "Access-Control-Allow-Credentials", value: "true" },
       { key: "Access-Control-Allow-Origin", value: "*" },
       { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },

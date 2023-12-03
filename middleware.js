@@ -3,7 +3,7 @@ import { NextResponse, userAgent } from 'next/server'
 
 export function middleware(req, ev) {
   // const headersInstance = headers()
-  // const authorization = headersInstance.get('authorization')
+  // const authorization = headersInstance.get('Authorization')
   // if (!authorization || authorization !== process.env.DATA_API_KEY) {
   //   return NextResponse.json(
   //     {
