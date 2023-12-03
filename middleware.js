@@ -1,9 +1,9 @@
 import { headers } from 'next/headers'
 import { NextResponse, userAgent } from 'next/server'
 
-export function middleware(req, ev) {console.log(req)
+export function middleware(req, ev) {
   if(req.method === "OPTIONS") {
-    return NextResponse.status(200).send({ message: 'ok' });
+    return NextResponse.next()
   }
   const headersInstance = headers()
   const authorization = headersInstance.get('Authorization')
