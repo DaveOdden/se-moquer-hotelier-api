@@ -3,7 +3,7 @@ import { NextResponse, userAgent } from 'next/server'
 
 export function middleware(req, ev) {
   if(req.method === "OPTIONS") {
-    return res.status(200).send({ message: 'ok' });
+    return NextResponse.status(200).send({ message: 'ok' });
   }
   const headersInstance = headers()
   const authorization = headersInstance.get('Authorization')
