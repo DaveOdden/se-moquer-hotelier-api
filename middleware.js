@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 import { NextResponse, userAgent } from 'next/server'
 
-export function middleware(req, ev) {
+export function middleware(req, ev) {console.log(req)
   if(req.method === "OPTIONS") {
     return NextResponse.status(200).send({ message: 'ok' });
   }
