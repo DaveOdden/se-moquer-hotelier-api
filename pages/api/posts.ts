@@ -16,17 +16,17 @@ export default async function handler(
     case 'GET': {
       return getPosts(req, res);
     }
-
     case 'POST': {
       return addPost(req, res);
     }
-
     case 'PUT': {
       return updatePost(req, res);
     }
-
     case 'DELETE': {
       return deletePost(req, res);
+    }
+    case 'OPTIONS': {
+      return res.status(200).send({ message: 'ok' });
     }
   }
 

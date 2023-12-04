@@ -17,6 +17,9 @@ export default async function handler(
     case 'GET': {
       return getOneGuest(req, res);
     }
+    case 'OPTIONS': {
+      return res.status(200).send({ message: 'ok' });
+    }
   }
 
   async function getOneGuest(
