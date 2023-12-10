@@ -107,16 +107,6 @@ export default async function handler(
         }
       )
 
-      // update corresponding guest record with dates
-      await db.collection("guests").updateOne(
-        {
-          _id: guestId,
-        },
-        {
-          $push: { datesOfStay: { $each: arrayOfDatesBooked } },
-        }
-      )
-
       // update corresponding guest record with history
       let bookingData = structuredClone(data)
       delete bookingData.guest
@@ -125,7 +115,10 @@ export default async function handler(
           _id: new ObjectId(guestId),
         },
         {
-          $push: { history: { action: "New Booking", booking: bookingData } },
+          $push: {
+            history: { action: "New Booking", booking: bookingData },
+            datesOfStay: { $each: arrayOfDatesBooked },
+          },
         }
       )
 
