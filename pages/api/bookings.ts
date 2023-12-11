@@ -116,7 +116,13 @@ export default async function handler(
         },
         {
           $push: {
-            history: { action: "New Booking", booking: bookingData },
+            history: {
+              category: "booking",
+              action: "New Booking",
+              data: bookingData,
+              by: "Hotel Manager",
+              date: new Date(),
+            },
             datesOfStay: { $each: arrayOfDatesBooked },
           },
         }
@@ -227,7 +233,15 @@ export default async function handler(
           _id: new ObjectId(thisBooking.guest._id),
         },
         {
-          $push: { history: { action: "Booking Updated", booking: bodyJson } },
+          $push: {
+            history: {
+              category: "booking",
+              action: "Booking Updated",
+              data: bodyJson,
+              by: "Hotel Manager",
+              date: new Date(),
+            },
+          },
         }
       )
 
@@ -311,7 +325,13 @@ export default async function handler(
           },
           {
             $push: {
-              history: { action: "Cancelled Booking", booking: bookingInfo },
+              history: {
+                category: "booking",
+                action: "Cancelled Booking",
+                data: bookingInfo,
+                by: "Hotel Manager",
+                date: new Date(),
+              },
             },
           }
         )
