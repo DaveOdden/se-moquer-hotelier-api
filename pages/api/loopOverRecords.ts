@@ -25,7 +25,16 @@ export default async function handler(
       },
       {
         $set: {
-          currentlyAssignedRoom: -1,
+          history: [
+            {
+              id: new ObjectId(),
+              category: "guest",
+              action: "Guest Created",
+              data: guest,
+              by: "Hotel Manager",
+              date: guest.signUpDate ? new Date(guest.signUpDate) : new Date(),
+            },
+          ],
         },
       }
     )
@@ -37,7 +46,6 @@ export default async function handler(
       let guests = await db.collection(collectionName).find().toArray()
 
       guests.forEach((guest: any) => {
-        console.log(guest)
         pushField(db, guest)
       })
 

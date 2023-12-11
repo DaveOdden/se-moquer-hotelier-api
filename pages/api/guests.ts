@@ -81,6 +81,7 @@ export default async function handler(
           $set: bodyJson,
           $push: {
             history: {
+              id: new ObjectId(),
               category: "guest",
               action: "Guest Info Updated",
               data: bodyJson,
