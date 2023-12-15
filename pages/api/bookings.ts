@@ -71,8 +71,8 @@ export default async function handler(
         _id: roomId,
       }
 
-      data.checkinDate = dayjs(data.checkinDate).utc().format()
-      data.checkoutDate = dayjs(data.checkoutDate).utc().format()
+      data.checkinDate = dayjs.utc(data.checkinDate).format()
+      data.checkoutDate = dayjs.utc(data.checkoutDate).format()
       console.log(data.checkinDate)
       console.log(data.checkoutDate)
 
