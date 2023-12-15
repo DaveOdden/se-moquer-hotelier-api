@@ -2,6 +2,8 @@ const { connectToDatabase } = require("../../lib/mongodb")
 const ObjectId = require("mongodb").ObjectId
 import type { NextApiRequest, NextApiResponse } from "next"
 import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(utc)
 
 type ResponseData = {
   message: string
@@ -46,8 +48,8 @@ export default async function handler(
         .collection(collectionName)
         .find({
           checkinDate: {
-            $gte: dayjs().startOf("day").format(),
-            $lte: dayjs().endOf("day").format(),
+            $gte: dayjs().utc().startOf("day").format(),
+            $lte: dayjs().utc().endOf("day").format(),
           },
         })
         .toArray()
