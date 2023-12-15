@@ -1,5 +1,6 @@
 const { connectToDatabase } = require("../../lib/mongodb")
 const dayjs = require("dayjs")
+const utc = require("dayjs/plugin/utc")
 const util = require("./util/util")
 const ObjectId = require("mongodb").ObjectId
 import type { NextApiRequest, NextApiResponse } from "next"
@@ -69,6 +70,11 @@ export default async function handler(
       data.room = {
         _id: roomId,
       }
+
+      data.checkinDate = data.checkinDate.utc()
+      data.checkoutDate = data.checkoutDate.utc()
+      console.log(data.checkinDate)
+      console.log(data.checkoutDate)
 
       const addOneDayToDate = (_date: any) => {
         const a = dayjs(_date)
