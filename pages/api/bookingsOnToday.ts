@@ -30,11 +30,16 @@ export default async function handler(
   ) {
     try {
       let { db } = await connectToDatabase()
+      let startOfDay =
+        req.query && req.query.startOfDay ? req.query.startOfDay : ""
+      let endOfDay = req.query && req.query.endOfDay ? req.query.endOfDay : ""
       let start = new Date()
       let end = new Date()
       // console.log("")
       // console.log(start)
       // console.log(end)
+      console.log("startOfDay: " + startOfDay)
+      console.log("endOfDay: " + endOfDay)
       console.log(dayjs().startOf("day").format("hh-mm-ss"))
       console.log(dayjs().endOf("day").format("hh-mm-ss"))
 
@@ -48,8 +53,8 @@ export default async function handler(
         .collection(collectionName)
         .find({
           checkinDate: {
-            $gte: dayjs().utc().startOf("day").format(),
-            $lte: dayjs().utc().endOf("day").format(),
+            $gte: startOfDay,
+            $lte: endOfDay,
           },
         })
         .toArray()
