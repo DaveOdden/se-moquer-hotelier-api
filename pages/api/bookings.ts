@@ -72,13 +72,6 @@ export default async function handler(
         _id: roomId,
       }
 
-      console.log(data.checkinDate)
-      console.log(data.checkoutDate)
-      data.checkinDate = dayjs.utc(data.checkinDate).format()
-      data.checkoutDate = dayjs.utc(data.checkoutDate).format()
-      console.log(data.checkinDate)
-      console.log(data.checkoutDate)
-
       const addOneDayToDate = (_date: any) => {
         const a = dayjs(_date)
         return a.add(1, "day")
