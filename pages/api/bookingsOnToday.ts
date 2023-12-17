@@ -33,6 +33,8 @@ export default async function handler(
       let startOfDay =
         req.query && req.query.startOfDay ? req.query.startOfDay : ""
       let endOfDay = req.query && req.query.endOfDay ? req.query.endOfDay : ""
+      let checkedIn =
+        req.query && req.query.checkedIn ? req.query.checkedIn : ""
       let start = new Date()
       let end = new Date()
 
@@ -52,7 +54,7 @@ export default async function handler(
             $gte: startOfDay,
             $lte: endOfDay,
           },
-          checkedIn: false,
+          checkedIn: checkedIn,
         })
         .toArray()
 
