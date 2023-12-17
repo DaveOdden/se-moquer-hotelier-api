@@ -35,17 +35,16 @@ export default async function handler(
       let endOfDay = req.query && req.query.endOfDay ? req.query.endOfDay : ""
       let checkedIn =
         req.query && req.query.checkedIn ? req.query.checkedIn : ""
-      let start = new Date()
-      let end = new Date()
 
-      console.log("startOfDay: " + startOfDay)
-      console.log("endOfDay: " + endOfDay)
-      console.log(dayjs().startOf("day").format("hh-mm-ss"))
-      console.log(dayjs().endOf("day").format("hh-mm-ss"))
+      // console.log("startOfDay: " + startOfDay)
+      // console.log("endOfDay: " + endOfDay)
+      // console.log(dayjs().startOf("day").format("hh-mm-ss"))
+      // console.log(dayjs().endOf("day").format("hh-mm-ss"))
 
-      console.log(start)
-      console.log(end)
-      console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
+      // console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
+
+      console.log(typeof checkedIn)
+      console.log(checkedIn)
 
       let bookings = await db
         .collection(collectionName)
