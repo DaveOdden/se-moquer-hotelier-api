@@ -54,7 +54,7 @@ export default async function handler(
             $gte: startOfDay,
             $lte: endOfDay,
           },
-          checkedIn: checkedIn,
+          checkedIn: checkedIn === "true",
         })
         .toArray()
 
