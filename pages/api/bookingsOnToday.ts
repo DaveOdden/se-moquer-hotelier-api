@@ -33,18 +33,6 @@ export default async function handler(
       let startOfDay =
         req.query && req.query.startOfDay ? req.query.startOfDay : ""
       let endOfDay = req.query && req.query.endOfDay ? req.query.endOfDay : ""
-      let checkedIn =
-        req.query && req.query.checkedIn ? req.query.checkedIn : ""
-
-      // console.log("startOfDay: " + startOfDay)
-      // console.log("endOfDay: " + endOfDay)
-      // console.log(dayjs().startOf("day").format("hh-mm-ss"))
-      // console.log(dayjs().endOf("day").format("hh-mm-ss"))
-
-      // console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
-
-      console.log(typeof checkedIn)
-      console.log(checkedIn)
 
       let bookings = await db
         .collection(collectionName)
@@ -53,7 +41,6 @@ export default async function handler(
             $gte: startOfDay,
             $lte: endOfDay,
           },
-          checkedIn: checkedIn === "true",
         })
         .toArray()
 
