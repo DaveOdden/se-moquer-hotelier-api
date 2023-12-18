@@ -77,27 +77,42 @@ export default async function handler(
         return a.add(1, "day")
       }
 
-      let arrayOfDatesBooked: Array<any> = []
+      let arrayOfDatesBooked: Array<string> = []
 
       if (dayjs(data.checkinDate).isSame(dayjs(data.checkoutDate), "day")) {
         arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       }
+
+      console.log("")
+      console.log("dates and comparison")
+      console.log(data.checkinDate)
+      console.log(data.checkoutDate)
+      console.log(
+        dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
+      )
+
       if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
         var dateWithinRange = true
         var cyclingDate = dayjs(data.checkinDate)
+        console.log(dayjs(data.checkinDate))
         while (dateWithinRange) {
           if (dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), "day")) {
+            console.log("is same date. stop looping")
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             dateWithinRange = false
             break
           } else if (
             dayjs(cyclingDate).isBefore(dayjs(data.checkoutDate), "day")
           ) {
+            console.log("not same date. keep looping")
+
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             cyclingDate = addOneDayToDate(cyclingDate)
           }
         }
       }
+
+      console.log(arrayOfDatesBooked)
 
       // update corresponding room record with dates
       await db.collection("rooms").updateOne(

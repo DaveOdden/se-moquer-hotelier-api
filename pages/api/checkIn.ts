@@ -39,7 +39,7 @@ export default async function handler(
         }
       )
 
-      console.log(addDatesToNewRoom)
+      // console.log(addDatesToNewRoom)
       return res.json({
         message: "Guest checked in",
         success: true,
