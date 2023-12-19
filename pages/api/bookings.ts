@@ -92,16 +92,13 @@ export default async function handler(
       console.log("dates and comparison")
       console.log(data.checkinDate)
       console.log(data.checkoutDate)
+      console.log(dayjs(data.checkinDate).format())
+      console.log(dayjs(data.checkoutDate).format())
       console.log(
         dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
       )
 
-      if (
-        dayjs(dayjs(data.checkinDate).format()).isBefore(
-          dayjs(dayjs(data.checkoutDate).format()),
-          "day"
-        )
-      ) {
+      if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
         var dateWithinRange = true
         var cyclingDate = dayjs(data.checkinDate)
         console.log(dayjs(data.checkinDate))
