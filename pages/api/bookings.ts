@@ -79,7 +79,12 @@ export default async function handler(
 
       let arrayOfDatesBooked: Array<string> = []
 
-      if (dayjs(data.checkinDate).isSame(dayjs(data.checkoutDate), "day")) {
+      if (
+        dayjs(data.checkinDate)
+          .format("YYYY-MM-DD")
+          .isSame(dayjs(data.checkoutDate), "day")
+          .format("YYYY-MM-DD")
+      ) {
         arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       }
 
@@ -91,7 +96,12 @@ export default async function handler(
         dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
       )
 
-      if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
+      if (
+        dayjs(data.checkinDate)
+          .format("YYYY-MM-DD")
+          .isBefore(dayjs(data.checkoutDate), "day")
+          .format("YYYY-MM-DD")
+      ) {
         var dateWithinRange = true
         var cyclingDate = dayjs(data.checkinDate)
         console.log(dayjs(data.checkinDate))
