@@ -88,23 +88,12 @@ export default async function handler(
       //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       // }
 
-      const test = dayjs.utc(data.checkinDate).utcOffset(1, true).format()
-      const test2 = dayjs.utc(data.checkinDate).utcOffset(1, false).format()
-      const test3 = dayjs.utc(data.checkinDate).utcOffset(1, false)
-
       // console.log("")
       // console.log("dates and comparison")
       // console.log(data.checkinDate)
       // console.log(data.checkoutDate)
       console.log(data.checkinDate)
-      console.log(test)
-      console.log(test2)
-      console.log(test3)
-
-      const date2 = new Date(data.checkinDate)
-
-      console.log(date2)
-      console.log(date2.getTimezoneOffset())
+      console.log(dayjs(data.checkinDate))
 
       //console.log(new Date(data.checkinDate).getTimezoneOffset())
 
