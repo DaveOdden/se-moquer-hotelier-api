@@ -1,10 +1,10 @@
 const { connectToDatabase } = require("../../lib/mongodb")
 const dayjs = require("dayjs")
-//const utc = require("dayjs/plugin/utc")
+const utc = require("dayjs/plugin/utc")
 const util = require("./util/util")
 const ObjectId = require("mongodb").ObjectId
 import type { NextApiRequest, NextApiResponse } from "next"
-//dayjs.extend(utc)
+dayjs.extend(utc)
 
 type ResponseData = {
   message: string
@@ -88,12 +88,16 @@ export default async function handler(
       //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       // }
 
+      const test = dayjs.utc(data.checkinDate).utcOffset(1, true).format()
+
       // console.log("")
       // console.log("dates and comparison")
       // console.log(data.checkinDate)
       // console.log(data.checkoutDate)
       console.log(data.checkinDate)
-      console.log(new Date(data.checkinDate).getTimezoneOffset())
+      console.log(test)
+      //console.log(new Date(data.checkinDate).getTimezoneOffset())
+
       // console.log(dayjs(data.checkoutDate).format())
       // console.log(
       //   dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
