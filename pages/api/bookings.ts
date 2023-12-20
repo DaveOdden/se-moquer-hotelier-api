@@ -92,7 +92,8 @@ export default async function handler(
       // console.log("dates and comparison")
       // console.log(data.checkinDate)
       // console.log(data.checkoutDate)
-      console.log(dayjs(data.checkinDate).getTimezoneOffset())
+      console.log(data.checkinDate)
+      console.log(new Date(data.checkinDate).getTimezoneOffset())
       // console.log(dayjs(data.checkoutDate).format())
       // console.log(
       //   dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
