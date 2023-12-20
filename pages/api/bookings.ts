@@ -88,20 +88,20 @@ export default async function handler(
       //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       // }
 
-      console.log("")
-      console.log("dates and comparison")
-      console.log(data.checkinDate)
-      console.log(data.checkoutDate)
-      console.log(dayjs(data.checkinDate).format())
-      console.log(dayjs(data.checkoutDate).format())
-      console.log(
-        dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
-      )
+      // console.log("")
+      // console.log("dates and comparison")
+      // console.log(data.checkinDate)
+      // console.log(data.checkoutDate)
+      console.log(dayjs(data.checkinDate).getTimezoneOffset())
+      // console.log(dayjs(data.checkoutDate).format())
+      // console.log(
+      //   dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
+      // )
 
       if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
         var dateWithinRange = true
         var cyclingDate = dayjs(data.checkinDate)
-        console.log(dayjs(data.checkinDate))
+        //console.log(dayjs(data.checkinDate))
         while (dateWithinRange) {
           if (dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), "day")) {
             console.log("is same date. stop looping")
