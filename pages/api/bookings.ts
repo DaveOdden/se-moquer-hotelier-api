@@ -89,6 +89,8 @@ export default async function handler(
       // }
 
       const test = dayjs.utc(data.checkinDate).utcOffset(1, true).format()
+      const test2 = dayjs.utc(data.checkinDate).utcOffset(1, false).format()
+      const test3 = dayjs.utc(data.checkinDate).utcOffset(1, false)
 
       // console.log("")
       // console.log("dates and comparison")
@@ -96,6 +98,14 @@ export default async function handler(
       // console.log(data.checkoutDate)
       console.log(data.checkinDate)
       console.log(test)
+      console.log(test2)
+      console.log(test3)
+
+      const date2 = new Date(data.checkinDate)
+
+      console.log(date2)
+      console.log(date2.getTimezoneOffset())
+
       //console.log(new Date(data.checkinDate).getTimezoneOffset())
 
       // console.log(dayjs(data.checkoutDate).format())
