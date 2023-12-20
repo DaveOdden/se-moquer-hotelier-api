@@ -1,10 +1,10 @@
 const { connectToDatabase } = require("../../lib/mongodb")
 const dayjs = require("dayjs")
-const utc = require("dayjs/plugin/utc")
+//const utc = require("dayjs/plugin/utc")
 const util = require("./util/util")
 const ObjectId = require("mongodb").ObjectId
 import type { NextApiRequest, NextApiResponse } from "next"
-dayjs.extend(utc)
+//dayjs.extend(utc)
 
 type ResponseData = {
   message: string
