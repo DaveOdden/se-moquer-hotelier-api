@@ -93,31 +93,32 @@ export default async function handler(
       //dayjs().utcOffset(utcOffset)
       console.log(dayjs(data.checkinDate).utcOffset())
 
-      const someDate = data.checkinDate
-      const originalTimezone = someDate.slice(-6)
-      const formattedDate = dayjs(someDate).utcOffset(originalTimezone).format()
+      const originalTimezone = data.checkinDate.slice(-6)
+      const formattedCheckinDate = dayjs(data.checkinDate).utcOffset(
+        originalTimezone
+      )
+      const formattedCheckoutDate = dayjs(data.checkoutDate).utcOffset(
+        originalTimezone
+      )
 
       console.log("formattedDate")
-      console.log(formattedDate)
+      console.log(formattedCheckinDate)
+      console.log(formattedCheckoutDate)
 
-      // console.log(
-      //   dayjs()
-      //     .utc(data.checkinDate)
-      //     .isBefore(dayjs().utc(data.checkinDate), "day")
-      // )
+      console.log(formattedCheckinDate.isBefore(formattedCheckoutDate, "day"))
 
-      if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
+      if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
         var dateWithinRange = true
         var cyclingDate = dayjs(data.checkinDate)
         //console.log(dayjs(data.checkinDate))
         while (dateWithinRange) {
-          if (dayjs(cyclingDate).isSame(dayjs(data.checkoutDate), "day")) {
+          if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
             console.log("is same date. stop looping")
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             dateWithinRange = false
             break
           } else if (
-            dayjs(cyclingDate).isBefore(dayjs(data.checkoutDate), "day")
+            dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
           ) {
             console.log("not same date. keep looping")
 
