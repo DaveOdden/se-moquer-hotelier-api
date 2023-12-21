@@ -90,25 +90,14 @@ export default async function handler(
       // }
 
       const utcOffset = req.query.utcOffset
-      dayjs().utcOffset(utcOffset)
-      console.log("")
-      console.log(req.query.utcOffset)
-      console.log("dates and comparison")
-      console.log(dayjs().utcOffset())
-      console.log(data.checkinDate)
+      //dayjs().utcOffset(utcOffset)
+      console.log(dayjs(data.checkinDate).utcOffset())
 
-      console.log(dayjs(data.checkinDate).format())
-      console.log(dayjs().utc(data.checkinDate).format())
-      console.log(dayjs(data.checkinDate).utc().format())
-      console.log(dayjs(data.checkinDate).format())
-      console.log(dayjs(data.checkinDate).utcOffset(utcOffset).format())
-      console.log(dayjs().utc(data.checkinDate).utcOffset(utcOffset).format())
-
-      console.log(
-        dayjs()
-          .utc(data.checkinDate)
-          .isBefore(dayjs().utc(data.checkinDate), "day")
-      )
+      // console.log(
+      //   dayjs()
+      //     .utc(data.checkinDate)
+      //     .isBefore(dayjs().utc(data.checkinDate), "day")
+      // )
 
       if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
         var dateWithinRange = true
