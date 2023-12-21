@@ -95,7 +95,7 @@ export default async function handler(
 
       const someDate = data.checkinDate
       const originalTimezone = someDate.slice(-6)
-      const formattedDate = dayjs(someDate).utcOffset(originalTimezone)
+      const formattedDate = dayjs(someDate).utcOffset(originalTimezone).format()
 
       console.log("formattedDate")
       console.log(formattedDate)
