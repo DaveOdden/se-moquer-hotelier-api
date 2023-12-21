@@ -80,19 +80,6 @@ export default async function handler(
 
       let arrayOfDatesBooked: Array<string> = []
 
-      // if (
-      //   dayjs(data.checkinDate)
-      //     .format()
-      //     .isSame(dayjs(data.checkoutDate), "day")
-      //     .format()
-      // ) {
-      //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
-      // }
-
-      const utcOffset = req.query.utcOffset
-      //dayjs().utcOffset(utcOffset)
-      console.log(dayjs(data.checkinDate).utcOffset())
-
       const originalTimezone = data.checkinDate.slice(-6)
       const formattedCheckinDate = dayjs(data.checkinDate).utcOffset(
         originalTimezone
@@ -101,27 +88,17 @@ export default async function handler(
         originalTimezone
       )
 
-      console.log("formattedDate")
-      console.log(formattedCheckinDate)
-      console.log(formattedCheckoutDate)
-
-      console.log(formattedCheckinDate.isBefore(formattedCheckoutDate, "day"))
-
       if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
         var dateWithinRange = true
         var cyclingDate = formattedCheckinDate
-        //console.log(dayjs(data.checkinDate))
         while (dateWithinRange) {
           if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
-            console.log("is same date. stop looping")
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             dateWithinRange = false
             break
           } else if (
             dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
           ) {
-            console.log("not same date. keep looping")
-
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             cyclingDate = addOneDayToDate(cyclingDate)
           }
@@ -181,7 +158,6 @@ export default async function handler(
       let { db } = await connectToDatabase()
       let bodyJson = JSON.parse(req.body)
       let newData = structuredClone(bodyJson)
-      // delete newData._id
       let guestId = bodyJson.guest
       let roomId = bodyJson.room
       newData.room = {
@@ -201,18 +177,36 @@ export default async function handler(
         newData.checkoutDate = thisBooking.checkoutDate
       }
 
-      // const originalTimezone = thisBooking.checkinDate.slice(-6)
-      // const formattedCheckinDate = dayjs(thisBooking.checkinDate).utcOffset(
-      //   originalTimezone
-      // )
-      // const formattedCheckoutDate = dayjs(thisBooking.checkoutDate).utcOffset(
-      //   originalTimezone
-      // )
+      const clientTimezone = thisBooking.checkinDate.slice(-6)
+      console.log(clientTimezone)
+      const original_formattedCheckinDate = util.formatDateFromClient(
+        thisBooking.checkinDate,
+        clientTimezone
+      )
+      const original_formattedCheckoutDate = util.formatDateFromClient(
+        thisBooking.checkoutDate,
+        clientTimezone
+      )
+      const new_formattedCheckinDate = util.formatDateFromClient(
+        newData.checkinDate,
+        clientTimezone
+      )
+      const new_formattedCheckoutDate = util.formatDateFromClient(
+        newData.checkoutDate,
+        clientTimezone
+      )
 
-      let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
-      let newDatesBooked = util.getArrayOfDatesBooked(newData) // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
+      let originalDatesBooked = util.getArrayOfDatesBooked(
+        original_formattedCheckinDate,
+        original_formattedCheckoutDate
+      )
+      let newDatesBooked = util.getArrayOfDatesBooked(
+        new_formattedCheckinDate,
+        new_formattedCheckoutDate
+      )
+      // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
 
-      // update booking
+      // BOOKING
       let dbResult = await db.collection(collectionName).updateOne(
         {
           _id: new ObjectId(req.query.id),
@@ -222,7 +216,7 @@ export default async function handler(
         }
       )
 
-      // remove original booked dates from room's datesBooked array
+      // ORIGINAL ROOM
       let removeDatesFromRoom
       if (thisBooking.room._id >= 0) {
         removeDatesFromRoom = await db.collection("rooms").updateOne(
@@ -235,8 +229,21 @@ export default async function handler(
         )
       }
 
-      // remove original booked dates from room's datesBooked array
+      // NEW ROOM (Potentially)
+      let roomToModify =
+        bodyJson.room === undefined ? thisBooking.room._id : bodyJson.room
+      let addDatesToNewRoom = await db.collection("rooms").updateOne(
+        {
+          _id: parseInt(roomToModify),
+        },
+        {
+          $push: { datesBooked: { $each: newDatesBooked } },
+        }
+      )
+
+      // GUEST
       let removeDatesFromGuest
+      console.log(guestId)
       if (thisBooking.room._id >= 0) {
         removeDatesFromGuest = await db.collection("guests").updateOne(
           {
@@ -248,33 +255,14 @@ export default async function handler(
         )
       }
 
-      // add booked dates to new room ***** ROOM IS EXPECTED IN PAYLOAD
-      let addDatesToNewRoom = await db.collection("rooms").updateOne(
-        {
-          _id: parseInt(bodyJson.room),
-        },
-        {
-          $push: { datesBooked: { $each: newDatesBooked } },
-        }
-      )
-
       // add booked dates to new room ***** GUEST IS EXPECTED IN PAYLOAD
-      let addDatesToNewGuest = await db.collection("guests").updateOne(
+      let modifyGuestRecord = await db.collection("guests").updateOne(
         {
           _id: new ObjectId(guestId),
         },
         {
-          $push: { datesOfStay: { $each: newDatesBooked } },
-        }
-      )
-
-      // update guest history
-      await db.collection("guests").updateOne(
-        {
-          _id: new ObjectId(thisBooking.guest._id),
-        },
-        {
           $push: {
+            datesOfStay: { $each: newDatesBooked },
             history: {
               category: "booking",
               action: "Booking Updated",
@@ -301,7 +289,6 @@ export default async function handler(
   async function deleteBooking(req: NextApiRequest, res: NextApiResponse<any>) {
     try {
       let { db } = await connectToDatabase()
-      let roomInfo: any
 
       const addOneDayToDate = (_date: any) => {
         const a = dayjs(_date)
@@ -340,8 +327,6 @@ export default async function handler(
           }
         }
       }
-
-      console.log(arrayOfDatesBooked)
 
       let removeDatesFromRoom
       if (bookingInfo.room._id >= 0) {
