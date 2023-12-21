@@ -4,6 +4,7 @@ const utc = require("dayjs/plugin/utc")
 const util = require("./util/util")
 const ObjectId = require("mongodb").ObjectId
 import type { NextApiRequest, NextApiResponse } from "next"
+import { headers } from "next/headers"
 dayjs.extend(utc)
 
 type ResponseData = {
@@ -38,6 +39,9 @@ export default async function handler(
     try {
       let { db } = await connectToDatabase()
       let rooms = await db.collection(collectionName).find().toArray()
+      const headersInstance = headers()
+      const browserUtcOffset = headersInstance.get("X-Local-UTC-Offset")
+      console.log(browserUtcOffset)
 
       let arrayOfRoomsBooked: Array<any> = []
       rooms.forEach((record: any) => {
