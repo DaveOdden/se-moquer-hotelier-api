@@ -361,7 +361,7 @@ export default async function handler(
             _id: new ObjectId(bookingInfo.guest._id),
           },
           {
-            $pull: { datesBooked: { $in: arrayOfDatesBooked } },
+            $pull: { datesOfStay: { $in: arrayOfDatesBooked } },
           },
           {
             $push: {
