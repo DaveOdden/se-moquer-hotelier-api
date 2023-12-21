@@ -201,6 +201,14 @@ export default async function handler(
         newData.checkoutDate = thisBooking.checkoutDate
       }
 
+      // const originalTimezone = thisBooking.checkinDate.slice(-6)
+      // const formattedCheckinDate = dayjs(thisBooking.checkinDate).utcOffset(
+      //   originalTimezone
+      // )
+      // const formattedCheckoutDate = dayjs(thisBooking.checkoutDate).utcOffset(
+      //   originalTimezone
+      // )
+
       let originalDatesBooked = util.getArrayOfDatesBooked(thisBooking)
       let newDatesBooked = util.getArrayOfDatesBooked(newData) // **** checkinDate and checkoutDate EXPECTED IN PAYLOAD
 
@@ -304,34 +312,28 @@ export default async function handler(
         _id: new ObjectId(req.query.id),
       })
 
+      const originalTimezone = bookingInfo.checkinDate.slice(-6)
+      const formattedCheckinDate = dayjs(bookingInfo.checkinDate).utcOffset(
+        originalTimezone
+      )
+      const formattedCheckoutDate = dayjs(bookingInfo.checkoutDate).utcOffset(
+        originalTimezone
+      )
+
       let arrayOfDatesBooked: Array<string> = []
-      if (
-        dayjs(bookingInfo.checkinDate).isSame(
-          dayjs(bookingInfo.checkoutDate),
-          "day"
-        )
-      ) {
-        arrayOfDatesBooked.push(
-          dayjs(bookingInfo.checkinDate).format("YYYY-MM-DD")
-        )
+      if (formattedCheckinDate.isSame(formattedCheckoutDate, "day")) {
+        arrayOfDatesBooked.push(formattedCheckinDate.format("YYYY-MM-DD"))
       }
-      if (
-        dayjs(bookingInfo.checkinDate).isBefore(
-          dayjs(bookingInfo.checkoutDate),
-          "day"
-        )
-      ) {
+      if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
         var dateWithinRange = true
-        var cyclingDate = dayjs(bookingInfo.checkinDate)
+        var cyclingDate = formattedCheckinDate
         while (dateWithinRange) {
-          if (
-            dayjs(cyclingDate).isSame(dayjs(bookingInfo.checkoutDate), "day")
-          ) {
+          if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             dateWithinRange = false
             break
           } else if (
-            dayjs(cyclingDate).isBefore(dayjs(bookingInfo.checkoutDate), "day")
+            dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
           ) {
             arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
             cyclingDate = addOneDayToDate(cyclingDate)
