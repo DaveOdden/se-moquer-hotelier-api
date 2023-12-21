@@ -40,6 +40,8 @@ export default async function handler(
       let { db } = await connectToDatabase()
       let rooms = await db.collection(collectionName).find().toArray()
 
+      if (req.query.utcOffset) console.log(req.query.utcOffset)
+
       let arrayOfRoomsBooked: Array<any> = []
       rooms.forEach((record: any) => {
         if (record.room._id) {
