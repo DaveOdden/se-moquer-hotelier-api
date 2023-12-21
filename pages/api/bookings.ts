@@ -341,6 +341,8 @@ export default async function handler(
         }
       }
 
+      console.log(arrayOfDatesBooked)
+
       let removeDatesFromRoom
       if (bookingInfo.room._id >= 0) {
         removeDatesFromRoom = await db.collection("rooms").updateOne(
@@ -357,6 +359,9 @@ export default async function handler(
         await db.collection("guests").updateOne(
           {
             _id: new ObjectId(bookingInfo.guest._id),
+          },
+          {
+            $pull: { datesBooked: { $in: arrayOfDatesBooked } },
           },
           {
             $push: {
