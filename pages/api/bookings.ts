@@ -165,8 +165,10 @@ export default async function handler(
           _id: new ObjectId(guestId),
         }
       }
-      newData.room = {
-        _id: roomId,
+      if (roomId) {
+        newData.room = {
+          _id: roomId,
+        }
       }
 
       // get original booking data
