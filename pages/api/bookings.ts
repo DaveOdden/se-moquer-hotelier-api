@@ -98,7 +98,6 @@ export default async function handler(
 
       console.log(dayjs(data.checkinDate).format())
       console.log(dayjs().utc(data.checkinDate).utcOffset(utcOffset))
-      console.log(dayjs().utc(data.checkinDate).utcOffset(utcOffset).format())
 
       console.log(
         dayjs()
