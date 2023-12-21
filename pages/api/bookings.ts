@@ -64,12 +64,13 @@ export default async function handler(
     try {
       let { db } = await connectToDatabase()
       let data = JSON.parse(req.body)
-      let guestId = data.guest
-      let roomId = data.room
-      data.guest = {
+      let clonedData = structuredClone(data)
+      let guestId = clonedData.guest
+      let roomId = clonedData.room
+      clonedData.guest = {
         _id: new ObjectId(guestId),
       }
-      data.room = {
+      clonedData.room = {
         _id: roomId,
       }
 
@@ -78,7 +79,7 @@ export default async function handler(
         return a.add(1, "day")
       }
 
-      let arrayOfDatesBooked: Array<string> = []
+      //let arrayOfDatesBooked: Array<string> = []
 
       const originalTimezone = data.checkinDate.slice(-6)
       const formattedCheckinDate = dayjs(data.checkinDate).utcOffset(
@@ -88,24 +89,29 @@ export default async function handler(
         originalTimezone
       )
 
-      if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
-        var dateWithinRange = true
-        var cyclingDate = formattedCheckinDate
-        while (dateWithinRange) {
-          if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
-            arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
-            dateWithinRange = false
-            break
-          } else if (
-            dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
-          ) {
-            arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
-            cyclingDate = addOneDayToDate(cyclingDate)
-          }
-        }
-      }
+      let arrayOfDatesBooked = util.getArrayOfDatesBooked(
+        formattedCheckinDate,
+        formattedCheckoutDate
+      )
 
-      console.log(arrayOfDatesBooked)
+      // if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
+      //   var dateWithinRange = true
+      //   var cyclingDate = formattedCheckinDate
+      //   while (dateWithinRange) {
+      //     if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
+      //       arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
+      //       dateWithinRange = false
+      //       break
+      //     } else if (
+      //       dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
+      //     ) {
+      //       arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
+      //       cyclingDate = addOneDayToDate(cyclingDate)
+      //     }
+      //   }
+      // }
+
+      // console.log(arrayOfDatesBooked)
 
       // update corresponding room record with dates
       await db.collection("rooms").updateOne(
@@ -118,7 +124,7 @@ export default async function handler(
       )
 
       // update corresponding guest record with history
-      let bookingData = structuredClone(data)
+      let bookingData = structuredClone(clonedData)
       delete bookingData.guest
       await db.collection("guests").updateOne(
         {
@@ -139,7 +145,7 @@ export default async function handler(
       )
 
       // insert booking
-      await db.collection(collectionName).insertOne(data)
+      await db.collection(collectionName).insertOne(clonedData)
 
       return res.json({
         message: "booking added successfully",
