@@ -39,9 +39,6 @@ export default async function handler(
     try {
       let { db } = await connectToDatabase()
       let rooms = await db.collection(collectionName).find().toArray()
-      const headersInstance = headers()
-      const browserUtcOffset = headersInstance.get("X-Local-UTC-Offset")
-      console.log(browserUtcOffset)
 
       let arrayOfRoomsBooked: Array<any> = []
       rooms.forEach((record: any) => {
