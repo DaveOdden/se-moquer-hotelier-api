@@ -109,7 +109,7 @@ export default async function handler(
 
       if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
         var dateWithinRange = true
-        var cyclingDate = dayjs(data.checkinDate)
+        var cyclingDate = formattedCheckinDate
         //console.log(dayjs(data.checkinDate))
         while (dateWithinRange) {
           if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
