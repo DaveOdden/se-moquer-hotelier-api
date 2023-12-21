@@ -63,8 +63,6 @@ export default async function handler(
   async function addBooking(req: NextApiRequest, res: NextApiResponse<any>) {
     try {
       let { db } = await connectToDatabase()
-      const utcOffset = req.query.utcOffset
-      dayjs().utcOffset(utcOffset)
       let data = JSON.parse(req.body)
       let guestId = data.guest
       let roomId = data.room
@@ -91,7 +89,10 @@ export default async function handler(
       //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       // }
 
+      const utcOffset = req.query.utcOffset
+      dayjs().utcOffset(utcOffset)
       console.log("")
+      console.log(req.query.utcOffset)
       console.log("dates and comparison")
       console.log(dayjs().utcOffset())
       console.log(data.checkinDate)
