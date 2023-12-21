@@ -160,6 +160,11 @@ export default async function handler(
       let newData = structuredClone(bodyJson)
       let guestId = bodyJson.guest
       let roomId = bodyJson.room
+      if (guestId) {
+        newData.guest = {
+          _id: new ObjectId(guestId),
+        }
+      }
       newData.room = {
         _id: roomId,
       }
@@ -311,27 +316,10 @@ export default async function handler(
         originalTimezone
       )
 
-      let arrayOfDatesBooked: Array<string> = []
-      if (formattedCheckinDate.isSame(formattedCheckoutDate, "day")) {
-        arrayOfDatesBooked.push(formattedCheckinDate.format("YYYY-MM-DD"))
-      }
-      if (formattedCheckinDate.isBefore(formattedCheckoutDate, "day")) {
-        var dateWithinRange = true
-        var cyclingDate = formattedCheckinDate
-        while (dateWithinRange) {
-          if (dayjs(cyclingDate).isSame(formattedCheckoutDate, "day")) {
-            arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
-            dateWithinRange = false
-            break
-          } else if (
-            dayjs(cyclingDate).isBefore(formattedCheckoutDate, "day")
-          ) {
-            arrayOfDatesBooked.push(dayjs(cyclingDate).format("YYYY-MM-DD"))
-            cyclingDate = addOneDayToDate(cyclingDate)
-          }
-        }
-      }
-
+      let arrayOfDatesBooked = util.getArrayOfDatesBooked(
+        formattedCheckinDate,
+        formattedCheckoutDate
+      )
       let removeDatesFromRoom
       if (bookingInfo.room._id >= 0) {
         removeDatesFromRoom = await db.collection("rooms").updateOne(
