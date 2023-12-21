@@ -178,7 +178,6 @@ export default async function handler(
       }
 
       const clientTimezone = thisBooking.checkinDate.slice(-6)
-      console.log(clientTimezone)
       const original_formattedCheckinDate = util.formatDateFromClient(
         thisBooking.checkinDate,
         clientTimezone
@@ -243,7 +242,6 @@ export default async function handler(
 
       // GUEST
       let removeDatesFromGuest
-      console.log(guestId)
       if (thisBooking.room._id >= 0) {
         removeDatesFromGuest = await db.collection("guests").updateOne(
           {
@@ -273,6 +271,12 @@ export default async function handler(
           },
         }
       )
+
+      console.log(dbResult)
+      console.log(removeDatesFromRoom)
+      console.log(addDatesToNewRoom)
+      console.log(removeDatesFromGuest)
+      console.log(modifyGuestRecord)
 
       return res.json({
         message: "Booking updated successfully",
