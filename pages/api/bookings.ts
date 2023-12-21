@@ -40,8 +40,6 @@ export default async function handler(
       let { db } = await connectToDatabase()
       let rooms = await db.collection(collectionName).find().toArray()
 
-      if (req.query.utcOffset) console.log(req.query.utcOffset)
-
       let arrayOfRoomsBooked: Array<any> = []
       rooms.forEach((record: any) => {
         if (record.room._id) {
@@ -65,6 +63,8 @@ export default async function handler(
   async function addBooking(req: NextApiRequest, res: NextApiResponse<any>) {
     try {
       let { db } = await connectToDatabase()
+      const utcOffset = req.query.utcOffset
+      dayjs().utcOffset(utcOffset)
       let data = JSON.parse(req.body)
       let guestId = data.guest
       let roomId = data.room
@@ -91,19 +91,20 @@ export default async function handler(
       //   arrayOfDatesBooked.push(dayjs(data.checkinDate).format("YYYY-MM-DD"))
       // }
 
-      // console.log("")
-      // console.log("dates and comparison")
-      // console.log(data.checkinDate)
-      // console.log(data.checkoutDate)
+      console.log("")
+      console.log("dates and comparison")
+      console.log(data.checkinDate)
+      console.log(data.checkoutDate)
+
       console.log(data.checkinDate)
       console.log(dayjs(data.checkinDate))
 
-      //console.log(new Date(data.checkinDate).getTimezoneOffset())
+      console.log(new Date(data.checkinDate).getTimezoneOffset())
 
-      // console.log(dayjs(data.checkoutDate).format())
-      // console.log(
-      //   dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
-      // )
+      console.log(dayjs(data.checkoutDate).format())
+      console.log(
+        dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")
+      )
 
       if (dayjs(data.checkinDate).isBefore(dayjs(data.checkoutDate), "day")) {
         var dateWithinRange = true
