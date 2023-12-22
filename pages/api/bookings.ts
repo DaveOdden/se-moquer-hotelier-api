@@ -107,6 +107,7 @@ export default async function handler(
         {
           $push: {
             history: {
+              id: new ObjectId(),
               category: "booking",
               action: "New Booking",
               data: bookingData,
@@ -200,11 +201,8 @@ export default async function handler(
         }
       )
 
-      // ORIGINAL ROOM - Only update if room
+      // ORIGINAL ROOM
       let removeDatesFromRoom
-      // if (!util.arraysEqual(originalDatesBooked, newDatesBooked)) {
-      console.log("IN RROOM")
-
       removeDatesFromRoom = await db.collection("rooms").updateOne(
         {
           _id: parseInt(thisBooking.room._id),
@@ -225,40 +223,37 @@ export default async function handler(
           $push: { datesBooked: { $each: newDatesBooked } },
         }
       )
-      // }
 
       // GUEST - DATES
       let removeDatesFromGuest
-      if (!util.arraysEqual(originalDatesBooked, newDatesBooked)) {
-        console.log("IN GGGGG")
-        removeDatesFromGuest = await db.collection("guests").updateOne(
-          {
-            _id: new ObjectId(thisBooking.guest._id),
-          },
-          {
-            $pull: { datesOfStay: { $in: originalDatesBooked } },
-          }
-        )
+      removeDatesFromGuest = await db.collection("guests").updateOne(
+        {
+          _id: new ObjectId(thisBooking.guest._id),
+        },
+        {
+          $pull: { datesOfStay: { $in: originalDatesBooked } },
+        }
+      )
 
-        // add booked dates to new room ***** GUEST IS EXPECTED IN PAYLOAD
-        let modifyGuestRecord = await db.collection("guests").updateOne(
-          {
-            _id: new ObjectId(thisBooking.guest._id),
-          },
-          {
-            $push: {
-              datesOfStay: { $each: newDatesBooked },
-              history: {
-                category: "booking",
-                action: "Booking Updated",
-                data: bodyJson,
-                by: "Hotel Manager",
-                date: new Date(),
-              },
+      // add booked dates to new room ***** GUEST IS EXPECTED IN PAYLOAD
+      let modifyGuestRecord = await db.collection("guests").updateOne(
+        {
+          _id: new ObjectId(thisBooking.guest._id),
+        },
+        {
+          $push: {
+            datesOfStay: { $each: newDatesBooked },
+            history: {
+              id: new ObjectId(),
+              category: "booking",
+              action: "Booking Updated",
+              data: bodyJson,
+              by: "Hotel Manager",
+              date: new Date(),
             },
-          }
-        )
-      }
+          },
+        }
+      )
 
       return res.json({
         message: "Booking updated successfully",
@@ -314,6 +309,7 @@ export default async function handler(
           {
             $push: {
               history: {
+                id: new ObjectId(),
                 category: "booking",
                 action: "Cancelled Booking",
                 data: bookingInfo,
