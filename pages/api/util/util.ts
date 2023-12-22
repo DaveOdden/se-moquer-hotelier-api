@@ -7,8 +7,6 @@ function addOneDayToDate(_date: any) {
 }
 
 function getArrayOfDatesBooked(checkinDate: Dayjs, checkoutDate: Dayjs) {
-  console.log(checkinDate)
-  console.log(checkoutDate)
   let arrayOfDatesBooked: Array<string> = []
   if (checkinDate.isSame(checkoutDate, "day")) {
     arrayOfDatesBooked.push(checkinDate.format("YYYY-MM-DD"))
@@ -28,6 +26,22 @@ function getArrayOfDatesBooked(checkinDate: Dayjs, checkoutDate: Dayjs) {
     }
   }
   return arrayOfDatesBooked
+}
+
+function arraysEqual(a: any[], b: any[]) {
+  if (a === b) return true
+  if (a == null || b == null) return false
+  if (a.length !== b.length) return false
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
 }
 
 // function getArrayOfDatesBooked(bookingInfo: any) {
@@ -56,4 +70,4 @@ function formatDateFromClient(date: Dayjs, clientTimezone: string) {
   return dayjs(date).utcOffset(clientTimezone)
 }
 
-module.exports = { getArrayOfDatesBooked, formatDateFromClient }
+module.exports = { arraysEqual, getArrayOfDatesBooked, formatDateFromClient }
