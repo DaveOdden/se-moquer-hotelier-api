@@ -202,32 +202,32 @@ export default async function handler(
 
       // ORIGINAL ROOM - Only update if room
       let removeDatesFromRoom
-      if (!util.arraysEqual(originalDatesBooked, newDatesBooked)) {
-        console.log("IN RROOM")
+      // if (!util.arraysEqual(originalDatesBooked, newDatesBooked)) {
+      console.log("IN RROOM")
 
-        removeDatesFromRoom = await db.collection("rooms").updateOne(
-          {
-            _id: parseInt(thisBooking.room._id),
-          },
-          {
-            $pull: { datesBooked: { $in: originalDatesBooked } },
-          }
-        )
+      removeDatesFromRoom = await db.collection("rooms").updateOne(
+        {
+          _id: parseInt(thisBooking.room._id),
+        },
+        {
+          $pull: { datesBooked: { $in: originalDatesBooked } },
+        }
+      )
 
-        // NEW ROOM (Potentially)
-        let roomToModify =
-          bodyJson.room === undefined ? thisBooking.room._id : bodyJson.room
-        let addDatesToNewRoom = await db.collection("rooms").updateOne(
-          {
-            _id: parseInt(roomToModify),
-          },
-          {
-            $push: { datesBooked: { $each: newDatesBooked } },
-          }
-        )
-      }
+      // NEW ROOM (Potentially)
+      let roomToModify =
+        bodyJson.room === undefined ? thisBooking.room._id : bodyJson.room
+      let addDatesToNewRoom = await db.collection("rooms").updateOne(
+        {
+          _id: parseInt(roomToModify),
+        },
+        {
+          $push: { datesBooked: { $each: newDatesBooked } },
+        }
+      )
+      // }
 
-      // GUEST
+      // GUEST - DATES
       let removeDatesFromGuest
       if (!util.arraysEqual(originalDatesBooked, newDatesBooked)) {
         console.log("IN GGGGG")
